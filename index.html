@@ -36,6 +36,19 @@
   @keyframes sparkOut{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
   @keyframes wandPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(255,224,98,.95)) drop-shadow(0 0 15px rgba(255,190,60,.55));transform:scale(1) rotateX(18deg) rotateY(-18deg)}50%{filter:drop-shadow(0 0 10px rgba(255,238,150,1)) drop-shadow(0 0 24px rgba(255,196,70,.78));transform:scale(1.12) rotateX(24deg) rotateY(-24deg)}}
   @keyframes magicTrail{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(var(--rot,0deg));filter:blur(.2px)}12%{opacity:.92}72%{opacity:.55;filter:blur(.1px)}100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) scale(1.45) rotate(calc(var(--rot,0deg) + 18deg));filter:blur(2px)}}
+  @keyframes footerWave{0%{transform:translateX(-4%) translateY(0)}50%{transform:translateX(3%) translateY(-5px)}100%{transform:translateX(-4%) translateY(0)}}
+  @keyframes footerTreeSway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(5deg)}}
+  @keyframes footerLeafDance{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-7px) rotate(8deg)}}
+  @keyframes footerBallBounce{0%,100%{transform:translateY(0) rotate(0)}45%{transform:translateY(-18px) rotate(18deg)}}
+  @keyframes footerKidPlay{0%,100%{transform:translateX(0) translateY(0) rotate(-2deg)}50%{transform:translateX(8px) translateY(-5px) rotate(3deg)}}
+  @keyframes footerSandSpark{0%,100%{opacity:.25;transform:scale(.8)}50%{opacity:.8;transform:scale(1.15)}}
+  @keyframes footerBirdFly{0%{transform:translateX(-16vw) translateY(0) scale(.9);opacity:0}8%{opacity:.85}55%{transform:translateX(52vw) translateY(-22px) scale(1)}92%{opacity:.85}100%{transform:translateX(116vw) translateY(5px) scale(.92);opacity:0}}
+  @keyframes footerBirdWing{0%,100%{transform:scaleY(.72) rotate(0)}50%{transform:scaleY(1.15) rotate(-3deg)}}
+  @keyframes footerFishSwim{0%{transform:translateX(112vw) translateY(0);opacity:0}10%{opacity:.75}50%{transform:translateX(42vw) translateY(-6px)}90%{opacity:.75}100%{transform:translateX(-18vw) translateY(4px);opacity:0}}
+  @keyframes footerFishTail{0%,100%{transform:rotate(-16deg)}50%{transform:rotate(16deg)}}
+  @keyframes footerAnimalWalk{0%{transform:translateX(-14vw) translateY(0);opacity:0}10%{opacity:.9}50%{transform:translateX(42vw) translateY(-3px)}90%{opacity:.9}100%{transform:translateX(112vw) translateY(0);opacity:0}}
+  @keyframes footerAnimalBob{0%,100%{transform:scaleX(-1) translateY(0) rotate(-2deg)}50%{transform:scaleX(-1) translateY(-5px) rotate(2deg)}}
+  @keyframes footerCloudDrift{0%{transform:translateX(-18vw);opacity:0}12%{opacity:.72}50%{opacity:.86}88%{opacity:.72}100%{transform:translateX(118vw);opacity:0}}
   @keyframes gameCardDeal{0%{opacity:0;transform:translateY(28px) rotate(-4deg) scale(.78)}70%{transform:translateY(-4px) rotate(1deg) scale(1.04)}100%{opacity:1;transform:none}}
   @keyframes gameMatch{0%{transform:scale(1)}45%{transform:scale(1.14) rotate(4deg)}100%{transform:scale(1)}}
   @keyframes gameCelebrate{0%{transform:translate(-50%,-50%) scale(.2) rotate(0);opacity:1}100%{transform:translate(calc(-50% + var(--cx)),calc(-50% + var(--cy))) scale(1.4) rotate(280deg);opacity:0}}
@@ -113,6 +126,41 @@
   .gallery-dot:hover{background:rgba(139,110,232,.55);transform:scale(1.2);}
   .gallery-dot.is-active{width:27px;background:var(--lav-d);box-shadow:0 5px 12px -5px rgba(139,110,232,.9);}
   .gallery-dot:focus-visible{outline:3px solid #ff7eb8;outline-offset:3px;}
+  [data-beach-footer]{isolation:isolate;overflow:hidden;background:linear-gradient(180deg,rgba(238,251,246,0) 0%,rgba(238,251,246,.05) 18%,rgba(225,248,247,.26) 54%,rgba(255,240,204,.52) 100%);}
+  [data-beach-footer]::before{content:"";position:absolute;inset:-70px 0 0;z-index:-3;background:transparent;pointer-events:none;}
+  [data-beach-footer]::after{content:"";position:absolute;left:0;right:0;top:0;height:110px;z-index:-2;background:transparent;pointer-events:none;}
+  .footer-wave{position:absolute;left:-8%;right:-8%;height:78px;border-radius:50% 50% 0 0/68% 68% 0 0;animation:footerWave 8s ease-in-out infinite;pointer-events:none;}
+  .footer-wave.one{bottom:72px;background:rgba(159,214,245,.34);z-index:-2;}
+  .footer-wave.two{bottom:48px;background:rgba(111,184,255,.22);animation-duration:10s;animation-delay:-2s;z-index:-2;}
+  .footer-sand{position:absolute;left:0;right:0;bottom:0;height:95px;z-index:-1;background:radial-gradient(circle at 20% 32%,rgba(255,255,255,.42) 0 2px,transparent 3px),radial-gradient(circle at 62% 68%,rgba(221,169,88,.18) 0 2px,transparent 3px),linear-gradient(180deg,rgba(255,227,154,.62),rgba(255,213,154,.72));background-size:90px 46px,120px 62px,auto;}
+  .footer-palm{position:absolute;bottom:58px;width:118px;height:150px;z-index:0;transform-origin:50% 100%;animation:footerTreeSway 5.8s ease-in-out infinite;filter:drop-shadow(0 18px 16px rgba(74,63,107,.12));}
+  .footer-palm.left{left:7%;}
+  .footer-palm.right{right:8%;animation-delay:-1.2s;transform:scaleX(-1);}
+  .footer-palm .trunk{position:absolute;left:52px;bottom:0;width:18px;height:104px;border-radius:999px;background:repeating-linear-gradient(180deg,rgba(139,87,42,.22) 0 9px,transparent 9px 18px),linear-gradient(90deg,#986039 0%,#d79a5f 36%,#f0c58a 58%,#a66d42 100%);transform:rotate(7deg);box-shadow:inset 5px 0 7px rgba(255,255,255,.24),inset -5px 0 8px rgba(92,54,28,.22);}
+  .footer-palm .coconut{position:absolute;left:49px;top:43px;width:12px;height:12px;border-radius:50%;background:#8b5a32;box-shadow:10px 2px 0 #9a6538,5px 11px 0 #754928;z-index:2;}
+  .footer-palm .leaf{position:absolute;left:46px;top:16px;width:70px;height:28px;border-radius:80px 6px 80px 8px;background:linear-gradient(135deg,#2fa978 0%,#66d3a8 58%,#bff3dc 100%);transform-origin:10px 24px;animation:footerLeafDance 4.6s ease-in-out infinite;box-shadow:inset 0 5px 7px rgba(255,255,255,.18),inset -9px -5px 8px rgba(23,123,84,.18);}
+  .footer-palm .leaf:nth-child(1){transform:rotate(-82deg);width:62px;animation-delay:-.1s;}
+  .footer-palm .leaf:nth-child(2){transform:rotate(-48deg);animation-delay:-.5s;}
+  .footer-palm .leaf:nth-child(3){transform:rotate(-13deg);width:78px;animation-delay:-1s;}
+  .footer-palm .leaf:nth-child(4){transform:rotate(24deg);width:76px;animation-delay:-1.5s;}
+  .footer-palm .leaf:nth-child(5){transform:rotate(62deg);width:64px;animation-delay:-2s;}
+  .footer-play{position:absolute;bottom:72px;z-index:0;font-size:clamp(22px,3vw,34px);filter:drop-shadow(0 10px 10px rgba(74,63,107,.12));}
+  .footer-play.ball{left:32%;bottom:54px;animation:footerBallBounce 2.2s ease-in-out infinite;}
+  .footer-spark{position:absolute;bottom:34px;color:#ffd45e;text-shadow:0 0 10px rgba(255,212,94,.55);animation:footerSandSpark 3.2s ease-in-out infinite;}
+  .footer-spark.s1{left:18%}.footer-spark.s2{right:18%;animation-delay:-1s}.footer-spark.s3{left:52%;animation-delay:-1.8s}
+  .footer-bird{position:absolute;top:28%;left:0;width:34px;height:18px;z-index:0;animation:footerBirdFly 14s linear infinite;opacity:.85;}
+  .footer-bird.b2{top:19%;animation-duration:18s;animation-delay:-7s;transform:scale(.78);}
+  .footer-bird::before,.footer-bird::after{content:"";position:absolute;top:6px;width:18px;height:10px;border-top:3px solid rgba(74,63,107,.48);border-radius:50%;animation:footerBirdWing .55s ease-in-out infinite;}
+  .footer-bird::before{left:0;transform-origin:100% 50%;}
+  .footer-bird::after{right:0;transform-origin:0 50%;}
+  .footer-fish{position:absolute;bottom:88px;left:0;width:42px;height:22px;border-radius:55% 45% 45% 55%;color:#ff7eb8;background:linear-gradient(135deg,#ffb36d,#ff7eb8);z-index:-1;animation:footerFishSwim 16s linear infinite;box-shadow:inset 5px 5px 7px rgba(255,255,255,.28);}
+  .footer-fish.f2{bottom:112px;width:34px;height:18px;color:#6fb8ff;background:linear-gradient(135deg,#6fb8ff,#9fe7c9);animation-duration:20s;animation-delay:-8s;}
+  .footer-fish::before{content:"";position:absolute;right:-13px;top:5px;border-left:15px solid currentColor;border-top:7px solid transparent;border-bottom:7px solid transparent;color:inherit;filter:saturate(1.2);animation:footerFishTail .5s ease-in-out infinite;transform-origin:left center;}
+  .footer-fish::after{content:"";position:absolute;left:10px;top:6px;width:4px;height:4px;border-radius:50%;background:#4a3f6b;}
+  .footer-animal{position:absolute;bottom:33px;left:0;z-index:1;font-size:31px;animation:footerAnimalWalk 160s linear infinite;filter:drop-shadow(0 9px 8px rgba(74,63,107,.14));}
+  .footer-animal > span{display:inline-block;animation:footerAnimalBob .8s ease-in-out infinite;}
+  .footer-cloud{position:absolute;top:18%;left:0;width:82px;height:30px;border-radius:999px;background:rgba(255,255,255,.62);box-shadow:22px -10px 0 -2px rgba(255,255,255,.72),42px 0 0 -5px rgba(255,255,255,.56),0 12px 24px -18px rgba(74,63,107,.38);z-index:-1;animation:footerCloudDrift 24s linear infinite;pointer-events:none;}
+  .footer-cloud.c2{top:34%;width:64px;height:24px;animation-duration:30s;animation-delay:-12s;opacity:.62;}
   @media(max-width:520px){.memory-grid[data-pairs="3"],.memory-grid[data-pairs="6"]{grid-template-columns:repeat(3,minmax(58px,1fr));}.memory-grid[data-pairs="4"]{grid-template-columns:repeat(4,minmax(48px,1fr));}}
   @media(max-width:520px){.balloon-field{grid-template-columns:repeat(4,minmax(52px,76px));gap:12px}.pop-balloon{aspect-ratio:.78}}
   @media (max-width:1080px) and (min-width:860px){
@@ -208,12 +256,20 @@
     [data-mobile-minds]{top:-17%;left:-9%;animation:floatY 5.8s ease-in-out infinite;}
     [data-mobile-trust]{right:-10%;bottom:7%;animation:floatYs 5.2s ease-in-out .6s infinite;}
     [data-gallery-wrap]{padding:0 0 14px;border-radius:0;}
-    [data-gallery-track]{gap:14px;padding:6px 1px 38px;scroll-padding-inline:1px;}
-    [data-gallery-card]{flex-basis:min(78vw,300px);height:255px !important;border:0 !important;}
+    [data-gallery-track]{gap:14px;padding:6px 12px 42px;scroll-padding-inline:12px;scroll-snap-type:x mandatory;}
+    [data-gallery-card]{flex:0 0 min(84vw,330px) !important;height:245px !important;border:0 !important;scroll-snap-align:center;border-radius:22px !important;}
+    [data-gallery-card] > div:last-child{left:10px !important;bottom:10px !important;padding:7px 12px !important;font-size:13px !important;border-radius:14px !important;}
     [data-gallery-prev]{left:4px;}
     [data-gallery-next]{right:4px;}
     .gallery-arrow{width:42px;height:42px;font-size:23px;}
-    [data-gallery-dots]{right:0;bottom:0;}
+    [data-gallery-dots]{right:50%;bottom:0;transform:translateX(50%);max-width:calc(100% - 24px);justify-content:center;}
+  }
+  @media (max-width:750px){
+    .footer-palm.left{display:none;}
+    .footer-palm.right{right:3%;bottom:56px;width:86px;height:112px;opacity:.78;}
+    .footer-palm.right .trunk{left:38px;width:14px;height:78px;}
+    .footer-palm.right .coconut{left:35px;top:32px;width:10px;height:10px;box-shadow:8px 1px 0 #9a6538,4px 8px 0 #754928;}
+    .footer-palm.right .leaf{left:32px;top:10px;width:54px;height:22px;}
   }
   @media (max-width:430px){
     [data-nav-brand] > span:first-child{width:42px !important;height:42px !important;border-radius:14px !important;}
@@ -228,6 +284,35 @@
     [data-trust-row] strong{font-size:14px !important;}
     [data-mobile-minds]{left:-3%;}
     [data-mobile-trust]{right:-3%;}
+    .footer-palm{width:58px;height:82px;bottom:58px;opacity:.72;}
+    .footer-palm.left{display:none;}
+    .footer-palm.right{right:-3px;bottom:54px;}
+    .footer-palm .trunk{left:26px;width:10px;height:62px;}
+    .footer-palm .coconut{left:24px;top:22px;width:8px;height:8px;box-shadow:7px 1px 0 #9a6538,4px 7px 0 #754928;}
+    .footer-palm .leaf{left:20px;top:5px;width:38px;height:17px;}
+    .footer-play{font-size:21px;bottom:62px;opacity:.75;}
+    .footer-play.ball{left:50%;bottom:44px;transform:translateX(-50%);}
+    .footer-bird{width:26px;top:20%;opacity:.58;}
+    .footer-cloud{width:54px;height:20px;top:26%;opacity:.5;}
+    .footer-cloud.c2{display:none;}
+    .footer-fish{width:24px;height:13px;bottom:72px;opacity:.42;}
+    .footer-fish.f2{display:none;}
+    .footer-animal{display:none;}
+    .footer-wave{height:46px;}
+    .footer-wave.one{bottom:56px;}
+    .footer-wave.two{bottom:43px;}
+    .footer-sand{height:62px;}
+    .footer-spark{display:none;}
+    [data-beach-footer]{min-height:250px !important;padding:54px 18px calc(78px + env(safe-area-inset-bottom)) !important;}
+    [data-beach-footer] > div[style*="z-index:1"]{max-width:320px;margin:0 auto;}
+    [data-beach-footer] strong{font-size:18px !important;line-height:1.15;}
+    [data-beach-footer] p{font-size:12px !important;line-height:1.45;margin-top:7px !important;}
+    [data-beach-footer] p:last-child{font-size:11px !important;max-width:260px;margin-left:auto !important;margin-right:auto !important;}
+  }
+  @media (max-width:380px){
+    [data-gallery-track]{gap:12px;padding-left:10px;padding-right:10px;scroll-padding-inline:10px;}
+    [data-gallery-card]{flex-basis:calc(100vw - 46px) !important;height:225px !important;border-radius:20px !important;}
+    [data-gallery-card] > div:last-child{font-size:12.5px !important;}
   }
   @media (prefers-reduced-motion: reduce){
     *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
@@ -711,21 +796,57 @@
             <span style="width:46px; height:46px; border-radius:50% 50% 50% 0; transform:rotate(45deg); background:linear-gradient(135deg,#ff8ec4,#ff6fae); box-shadow:0 10px 20px -6px rgba(255,110,170,.7); display:grid; place-items:center; animation:floatYs 3s ease-in-out infinite;"><span style="transform:rotate(-45deg); font-size:20px;">🧸</span></span>
           </div>
           <div style="position:absolute; left:14px; bottom:14px; padding:9px 15px; border-radius:14px; background:rgba(255,255,255,.85); backdrop-filter:blur(6px); font-family:'Fredoka',sans-serif; font-weight:600; font-size:13px; color:var(--ink);">📍 106, Green Road, Trincomalee</div>
+          <div style="display:none;">
+            <svg aria-hidden="true" viewBox="0 0 320 260" style="position:absolute;inset:8% 10% 6%;width:80%;height:84%;overflow:visible;">
+              <defs>
+                <linearGradient id="slMapFill" x1="80" y1="24" x2="230" y2="226" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9fe7c9"/><stop offset=".48" stop-color="#9fd6f5"/><stop offset="1" stop-color="#c5b3ff"/></linearGradient>
+                <filter id="slMapShadow" x="-30%" y="-30%" width="160%" height="160%"><feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#6f6593" flood-opacity=".28"/></filter>
+              </defs>
+              <path d="M160 14C131 31 111 62 100 91c-13 35-29 62-24 99 4 31 29 56 61 62 36 7 74-9 93-39 18-29 18-63 9-96-9-32-28-62-44-88-10-17-21-23-35-15Z" fill="url(#slMapFill)" stroke="rgba(255,255,255,.9)" stroke-width="8" filter="url(#slMapShadow)"/>
+              <path d="M126 67c20-15 49-19 73-6M101 145c38 17 82 11 124-13M121 214c30 12 62 6 91-14" fill="none" stroke="rgba(255,255,255,.5)" stroke-width="5" stroke-linecap="round"/>
+              <circle cx="215" cy="88" r="12" fill="#ff7eb8" stroke="#fff" stroke-width="5" style="filter:drop-shadow(0 8px 10px rgba(255,126,184,.45));animation:twinkle 2.2s ease-in-out infinite;"/>
+              <path d="M215 101c-11 15-19 23-19 23s-8-8-19-23" fill="none" stroke="#ff7eb8" stroke-width="5" stroke-linecap="round" opacity=".55"/>
+              <text x="202" y="70" text-anchor="middle" style="font-family:'Fredoka',sans-serif;font-weight:700;font-size:13px;fill:#4a3f6b;">Trincomalee</text>
+              <text x="212" y="232" text-anchor="middle" style="font-family:'Fredoka',sans-serif;font-weight:700;font-size:12px;fill:#6f6593;">Sri Lanka</text>
+            </svg>
+            <div aria-hidden="true" style="position:absolute;left:12%;top:14%;font-size:28px;animation:bob 4.2s ease-in-out infinite;">🌴</div>
+            <div aria-hidden="true" style="position:absolute;right:13%;bottom:20%;font-size:24px;animation:floatYs 4.6s ease-in-out infinite;">🛶</div>
+            <div aria-hidden="true" style="position:absolute;right:22%;top:18%;font-size:20px;animation:twinkle 3s ease-in-out infinite;">⭐</div>
+            <div style="position:absolute;left:50%;bottom:14px;transform:translateX(-50%);min-width:max-content;padding:9px 15px;border-radius:14px;background:rgba(255,255,255,.88);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);font-family:'Fredoka',sans-serif;font-weight:600;font-size:13px;color:var(--ink);box-shadow:0 10px 18px -14px rgba(74,63,107,.45);">📍 106, Green Road, Trincomalee</div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ====== FOOTER ====== -->
-  <footer style="position:relative; z-index:2; text-align:center; padding:clamp(40px,5vw,64px) 24px calc(clamp(36px,4vw,56px) + env(safe-area-inset-bottom));">
+  <footer data-beach-footer style="position:relative; z-index:2; text-align:center; min-height:clamp(260px,24vw,340px); padding:clamp(58px,7vw,92px) 24px calc(clamp(76px,8vw,110px) + env(safe-area-inset-bottom));">
+    <div class="footer-wave one" aria-hidden="true"></div>
+    <div class="footer-wave two" aria-hidden="true"></div>
+    <div class="footer-sand" aria-hidden="true"></div>
+    <div class="footer-palm left" aria-hidden="true"><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="coconut"></span><span class="trunk"></span></div>
+    <div class="footer-palm right" aria-hidden="true"><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="leaf"></span><span class="coconut"></span><span class="trunk"></span></div>
+    <span class="footer-bird b1" aria-hidden="true"></span>
+    <span class="footer-bird b2" aria-hidden="true"></span>
+    <span class="footer-cloud c1" aria-hidden="true"></span>
+    <span class="footer-cloud c2" aria-hidden="true"></span>
+    <span class="footer-fish f1" aria-hidden="true"></span>
+    <span class="footer-fish f2" aria-hidden="true"></span>
+    <span class="footer-animal" aria-hidden="true"><span>🐢</span></span>
+    <span class="footer-play ball" aria-hidden="true">🏖️</span>
+    <span class="footer-spark s1" aria-hidden="true">✦</span>
+    <span class="footer-spark s2" aria-hidden="true">✦</span>
+    <span class="footer-spark s3" aria-hidden="true">✦</span>
+    <div style="position:relative; z-index:1;">
     <div style="display:flex; gap:10px; justify-content:center; margin-bottom:16px; font-size:24px;">
       <span style="animation:bob 4s ease-in-out infinite;">🌟</span>
       <span style="animation:bob 4s ease-in-out .4s infinite;">🧸</span>
       <span style="animation:bob 4s ease-in-out .8s infinite;">🎈</span>
     </div>
-    <strong style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(18px,3vw,26px); color:var(--ink);">Children Day Care Center</strong>
+    <strong style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(18px,3vw,28px); color:var(--ink); text-shadow:0 2px 0 rgba(255,255,255,.5);">Children Day Care Center</strong>
     <p style="margin:8px 0 0; font-weight:700; letter-spacing:1px; color:var(--ink-soft);">Safe • Happy • Nurturing • Creative</p>
     <p style="margin:18px 0 0; font-size:13px; color:var(--ink-soft); opacity:.8;">106, Green Road, Trincomalee &nbsp;•&nbsp; 071 036 5378</p>
+    </div>
   </footer>
 
   <!-- ====== MOBILE STICKY CTA ====== -->
