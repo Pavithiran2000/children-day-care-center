@@ -16,6 +16,17 @@
   html{ scroll-behavior:smooth; }
   html.magic-custom-cursor,html.magic-custom-cursor *{cursor:none !important;}
   body{ margin:0; }
+  [data-reveal],[data-gallery-card],[data-gallery-card] > img,.memory-card,.memory-card-face,.pattern-choice,.food-choice,.pop-balloon,.game-picker,[data-bento-card]{
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
+    -webkit-transform:translateZ(0);
+    transform:translateZ(0);
+  }
+  [data-gallery-card] > img{
+    display:block;
+    -webkit-transform-origin:center center;
+    transform-origin:center center;
+  }
   :root{
     --lav:#b9a7f3; --lav-d:#8b6ee8;
     --mint:#9fe7c9; --peach:#ffc9a8; --sky:#9fd6f5;
@@ -96,8 +107,8 @@
   [data-gallery-track]::-webkit-scrollbar{display:none;}
   [data-gallery-card]{flex:0 0 calc((100% - 66px)/4);height:300px !important;scroll-snap-align:start;border:0 !important;border-radius:24px !important;outline:0 !important;opacity:1 !important;transform:none !important;animation:none !important;box-shadow:0 24px 44px -30px rgba(74,63,107,.54),0 14px 26px -22px rgba(139,110,232,.45) !important;transition:box-shadow .35s ease,filter .35s ease !important;}
   [data-gallery-card]{transform:none !important;}
-  [data-gallery-card] > img{transform:scale(1) !important;transform-origin:center center;transition:transform .75s cubic-bezier(.2,.75,.25,1),filter .75s ease !important;will-change:transform;}
-  [data-gallery-card]:hover > img,[data-gallery-card]:focus-within > img{transform:scale(1.075) !important;filter:saturate(1.08) brightness(1.03);}
+  [data-gallery-card] > img{-webkit-transform:translateZ(0) scale(1) !important;transform:translateZ(0) scale(1) !important;transform-origin:center center;transition:-webkit-transform .75s cubic-bezier(.2,.75,.25,1),transform .75s cubic-bezier(.2,.75,.25,1),filter .75s ease !important;will-change:transform;}
+  [data-gallery-card]:hover > img,[data-gallery-card]:focus-within > img{-webkit-transform:translateZ(0) scale(1.075) !important;transform:translateZ(0) scale(1.075) !important;filter:saturate(1.08) brightness(1.03);}
   [data-gallery-card] > div:last-child{left:12px !important;bottom:12px !important;padding:8px 13px !important;border:1px solid rgba(255,255,255,.75);box-shadow:0 8px 18px -12px rgba(38,26,66,.48);font-size:14px;}
   [data-gallery-card]:hover,[data-gallery-card]:focus-within{transform:none !important;filter:saturate(1.05) brightness(1.02);box-shadow:0 31px 48px -28px rgba(74,63,107,.58),0 18px 30px -24px rgba(139,110,232,.52) !important;z-index:2;}
   [data-gallery-wrap]{position:relative;padding:0 0 18px;background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;}
@@ -1694,7 +1705,7 @@ class Component extends DCLogic {
     if (!reduce && !coarse) {
       const layer = document.createElement('div');
       layer.setAttribute('aria-hidden', 'true');
-      layer.style.cssText = 'position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden;';
+      layer.style.cssText = 'position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden; -webkit-transform:translateZ(0); transform:translateZ(0); -webkit-backface-visibility:hidden; backface-visibility:hidden;';
       document.body.appendChild(layer);
       document.documentElement.style.cursor = 'none';
       document.documentElement.classList.add('magic-custom-cursor');
@@ -1702,12 +1713,12 @@ class Component extends DCLogic {
 
       // 3D magic wand cursor
       const wand = document.createElement('div');
-      wand.style.cssText = 'position:fixed; left:0; top:0; width:228px; height:228px; margin:-95px 0 0 -107px; pointer-events:none; opacity:1; transition:transform .08s ease-out,opacity .16s ease; will-change:transform,opacity; filter:drop-shadow(0 10px 12px rgba(74,63,107,.22));';
+      wand.style.cssText = 'position:fixed; left:0; top:0; width:228px; height:228px; margin:-95px 0 0 -107px; pointer-events:none; opacity:1; transition:-webkit-transform .08s ease-out,transform .08s ease-out,opacity .16s ease; will-change:transform,opacity; -webkit-transform:translateZ(0); transform:translateZ(0); -webkit-backface-visibility:hidden; backface-visibility:hidden; filter:drop-shadow(0 10px 12px rgba(74,63,107,.22));';
       wand.innerHTML = `<img src="assets/magic-wand.png" alt="" aria-hidden="true" draggable="false" style="display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;">`;
       layer.appendChild(wand);
 
       const handCursor = document.createElement('div');
-      handCursor.style.cssText = 'position:fixed; left:0; top:0; width:161px; height:161px; margin:-87px 0 0 -52px; pointer-events:none; opacity:0; transition:transform .12s ease-out,opacity .16s ease; will-change:transform,opacity; filter:drop-shadow(0 8px 10px rgba(74,63,107,.18));';
+      handCursor.style.cssText = 'position:fixed; left:0; top:0; width:161px; height:161px; margin:-87px 0 0 -52px; pointer-events:none; opacity:0; transition:-webkit-transform .12s ease-out,transform .12s ease-out,opacity .16s ease; will-change:transform,opacity; -webkit-transform:translateZ(0); transform:translateZ(0); -webkit-backface-visibility:hidden; backface-visibility:hidden; filter:drop-shadow(0 8px 10px rgba(74,63,107,.18));';
       handCursor.innerHTML = `<img src="assets/hand-cursor.png" alt="" aria-hidden="true" draggable="false" style="display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;">`;
       layer.appendChild(handCursor);
 
@@ -1727,7 +1738,7 @@ class Component extends DCLogic {
         const dy = (opts.dy != null ? opts.dy : (20 + Math.random() * 50));
         const dur = opts.dur || (0.7 + Math.random() * 0.6);
         s.textContent = g;
-        s.style.cssText = `position:fixed; left:${x}px; top:${y}px; font-size:${size}px; color:${c}; text-shadow:0 0 8px ${c}; pointer-events:none; transform:translate(-50%,-50%); --dx:${dx}px; --dy:${dy}px; animation:sparkOut ${dur}s ease-out forwards; will-change:transform,opacity;`;
+        s.style.cssText = `position:fixed; left:${x}px; top:${y}px; font-size:${size}px; color:${c}; text-shadow:0 0 8px ${c}; pointer-events:none; -webkit-transform:translate(-50%,-50%) translateZ(0); transform:translate(-50%,-50%) translateZ(0); --dx:${dx}px; --dy:${dy}px; -webkit-animation:sparkOut ${dur}s ease-out forwards; animation:sparkOut ${dur}s ease-out forwards; will-change:transform,opacity; -webkit-backface-visibility:hidden; backface-visibility:hidden;`;
         layer.appendChild(s);
         setTimeout(() => s.remove(), dur * 1000 + 60);
       };
@@ -1740,7 +1751,7 @@ class Component extends DCLogic {
         const dx = (Math.random() - 0.5) * 22;
         const dy = (Math.random() - 0.5) * 22;
         mark.textContent = glyph;
-        mark.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${size}px;color:${c};text-shadow:0 0 8px ${c},0 0 18px ${c};pointer-events:none;transform:translate(-50%,-50%);--dx:${dx}px;--dy:${dy}px;--rot:${angle}deg;animation:magicTrail 3s ease-out forwards;will-change:transform,opacity,filter;`;
+        mark.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${size}px;color:${c};text-shadow:0 0 8px ${c},0 0 18px ${c};pointer-events:none;-webkit-transform:translate(-50%,-50%) translateZ(0);transform:translate(-50%,-50%) translateZ(0);--dx:${dx}px;--dy:${dy}px;--rot:${angle}deg;-webkit-animation:magicTrail 3s ease-out forwards;animation:magicTrail 3s ease-out forwards;will-change:transform,opacity,filter;-webkit-backface-visibility:hidden;backface-visibility:hidden;`;
         layer.appendChild(mark);
         setTimeout(() => mark.remove(), 3060);
       };
@@ -1776,8 +1787,12 @@ class Component extends DCLogic {
 
       const tick = () => {
         wx += (tx - wx) * 0.22; wy += (ty - wy) * 0.22;
-        wand.style.transform = `translate(${wx}px, ${wy}px) scale(${cursorInteractive ? .82 : 1}) translateZ(0)`;
-        handCursor.style.transform = `translate(${wx}px, ${wy}px) scale(${cursorInteractive ? 1 : .86}) translateZ(0)`;
+        const wandTransform = `translate(${wx}px, ${wy}px) scale(${cursorInteractive ? .82 : 1}) translateZ(0)`;
+        const handTransform = `translate(${wx}px, ${wy}px) scale(${cursorInteractive ? 1 : .86}) translateZ(0)`;
+        wand.style.transform = wandTransform;
+        wand.style.webkitTransform = wandTransform;
+        handCursor.style.transform = handTransform;
+        handCursor.style.webkitTransform = handTransform;
         this._raf = requestAnimationFrame(tick);
       };
       this._raf = requestAnimationFrame(tick);
