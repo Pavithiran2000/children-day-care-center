@@ -36,6 +36,8 @@
   @keyframes sparkOut{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
   @keyframes wandPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(255,224,98,.95)) drop-shadow(0 0 15px rgba(255,190,60,.55));transform:scale(1) rotateX(18deg) rotateY(-18deg)}50%{filter:drop-shadow(0 0 10px rgba(255,238,150,1)) drop-shadow(0 0 24px rgba(255,196,70,.78));transform:scale(1.12) rotateX(24deg) rotateY(-24deg)}}
   @keyframes magicTrail{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(var(--rot,0deg));filter:blur(.2px)}12%{opacity:.92}72%{opacity:.55;filter:blur(.1px)}100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) scale(1.45) rotate(calc(var(--rot,0deg) + 18deg));filter:blur(2px)}}
+  @keyframes pointerTouchRipple{0%{opacity:.85;transform:translate(-50%,-50%) scale(.25);filter:blur(0)}55%{opacity:.35;filter:blur(.2px)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.75);filter:blur(1.4px)}}
+  @keyframes pointerTouchDot{0%{opacity:0;transform:translate(-50%,-50%) scale(.35)}18%{opacity:.95}100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.15)}}
   @keyframes footerWave{0%{transform:translateX(-4%) translateY(0)}50%{transform:translateX(3%) translateY(-5px)}100%{transform:translateX(-4%) translateY(0)}}
   @keyframes footerTreeSway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(5deg)}}
   @keyframes footerLeafDance{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-7px) rotate(8deg)}}
@@ -1866,6 +1868,24 @@ class Component extends DCLogic {
         setTimeout(() => mark.remove(), 3060);
       };
 
+      const spawnTouch = (x, y) => {
+        const ring = document.createElement('span');
+        ring.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:56px;height:56px;border-radius:999px;border:2px solid rgba(139,110,232,.56);background:radial-gradient(circle,rgba(255,142,196,.28),rgba(255,255,255,0) 62%);box-shadow:0 0 0 6px rgba(255,255,255,.35),0 0 22px rgba(176,123,255,.42);pointer-events:none;transform:translate(-50%,-50%);animation:pointerTouchRipple .58s ease-out forwards;will-change:transform,opacity,filter;`;
+        layer.appendChild(ring);
+        setTimeout(() => ring.remove(), 660);
+
+        for (let i = 0; i < 7; i++) {
+          const dot = document.createElement('span');
+          const a = (i / 7) * Math.PI * 2 + Math.random() * .35;
+          const dist = 20 + Math.random() * 24;
+          const size = 5 + Math.random() * 5;
+          const c = trailColors[(Math.random() * trailColors.length) | 0];
+          dot.style.cssText = `position:fixed;left:${x}px;top:${y}px;width:${size}px;height:${size}px;border-radius:999px;background:${c};box-shadow:0 0 10px ${c};pointer-events:none;--dx:${Math.cos(a) * dist}px;--dy:${Math.sin(a) * dist}px;animation:pointerTouchDot .52s ease-out forwards;will-change:transform,opacity;`;
+          layer.appendChild(dot);
+          setTimeout(() => dot.remove(), 620);
+        }
+      };
+
       this._onMove = (e) => {
         const px = tx, py = ty;
         tx = e.clientX; ty = e.clientY;
@@ -1884,7 +1904,11 @@ class Component extends DCLogic {
         if (now - lastSpawn > 55) { lastSpawn = now; spawn(tx + (Math.random()-0.5)*10, ty + (Math.random()-0.5)*10, { size: 9 + Math.random()*9, dy: 14 + Math.random()*30 }); }
       };
       this._onClick = (e) => {
-        if (e.target && e.target.closest && e.target.closest(interactiveSelector)) return;
+        if (e.target && e.target.closest && e.target.closest(interactiveSelector)) {
+          spawnTouch(e.clientX, e.clientY);
+          handCursor.style.transform = `translate(${wx}px, ${wy}px) scale(.9) translateZ(0)`;
+          return;
+        }
         const n = 12;
         for (let i = 0; i < n; i++) {
           const a = (i / n) * Math.PI * 2;
