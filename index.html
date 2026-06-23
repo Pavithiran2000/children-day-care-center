@@ -1,0 +1,1845 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  html.magic-custom-cursor,html.magic-custom-cursor *{cursor:none !important;}
+  body{ margin:0; }
+  :root{
+    --lav:#b9a7f3; --lav-d:#8b6ee8;
+    --mint:#9fe7c9; --peach:#ffc9a8; --sky:#9fd6f5;
+    --pink:#ffaed4; --pink-d:#ff7eb8; --yellow:#ffe39a;
+    --ink:#4a3f6b; --ink-soft:#6f6593;
+    --wa:#39c46a; --wa-d:#2aa857;
+    --glass:rgba(255,255,255,.55); --glass-brd:rgba(255,255,255,.75);
+  }
+  @keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-22px)}}
+  @keyframes floatYs{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-14px) rotate(6deg)}}
+  @keyframes twinkle{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1.15)}}
+  @keyframes spinSlow{to{transform:rotate(360deg)}}
+  @keyframes drift{0%{transform:translateX(0)}50%{transform:translateX(40px)}100%{transform:translateX(0)}}
+  @keyframes hueShift{0%{filter:hue-rotate(0)}100%{filter:hue-rotate(360deg)}}
+  @keyframes shine{0%{transform:translateX(-160%) skewX(-18deg)}60%,100%{transform:translateX(260%) skewX(-18deg)}}
+  @keyframes popIn{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  @keyframes sparkOut{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+  @keyframes wandPulse{0%,100%{filter:drop-shadow(0 0 6px rgba(255,224,98,.95)) drop-shadow(0 0 15px rgba(255,190,60,.55));transform:scale(1) rotateX(18deg) rotateY(-18deg)}50%{filter:drop-shadow(0 0 10px rgba(255,238,150,1)) drop-shadow(0 0 24px rgba(255,196,70,.78));transform:scale(1.12) rotateX(24deg) rotateY(-24deg)}}
+  @keyframes magicTrail{0%{opacity:0;transform:translate(-50%,-50%) scale(.35) rotate(var(--rot,0deg));filter:blur(.2px)}12%{opacity:.92}72%{opacity:.55;filter:blur(.1px)}100%{opacity:0;transform:translate(calc(-50% + var(--dx,0px)),calc(-50% + var(--dy,0px))) scale(1.45) rotate(calc(var(--rot,0deg) + 18deg));filter:blur(2px)}}
+  @keyframes gameCardDeal{0%{opacity:0;transform:translateY(28px) rotate(-4deg) scale(.78)}70%{transform:translateY(-4px) rotate(1deg) scale(1.04)}100%{opacity:1;transform:none}}
+  @keyframes gameMatch{0%{transform:scale(1)}45%{transform:scale(1.14) rotate(4deg)}100%{transform:scale(1)}}
+  @keyframes gameCelebrate{0%{transform:translate(-50%,-50%) scale(.2) rotate(0);opacity:1}100%{transform:translate(calc(-50% + var(--cx)),calc(-50% + var(--cy))) scale(1.4) rotate(280deg);opacity:0}}
+  @keyframes gameCloud{0%,100%{transform:translateX(0)}50%{transform:translateX(18px)}}
+  @keyframes lockFloat{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-12px)}}
+  .memory-grid{display:grid;grid-template-columns:repeat(4,minmax(64px,1fr));gap:clamp(9px,1.5vw,14px);max-width:650px;margin:0 auto;}
+  .memory-card{position:relative;aspect-ratio:1;border:0;padding:0;border-radius:clamp(16px,2.2vw,24px);cursor:pointer;background:linear-gradient(145deg,#fff,#f6efff);box-shadow:0 12px 24px -14px rgba(74,63,107,.45),inset 0 1px 0 #fff;transform-style:preserve-3d;transition:transform .42s cubic-bezier(.2,.75,.25,1.35),box-shadow .25s;animation:gameCardDeal .55s cubic-bezier(.2,.75,.25,1.2) both;animation-delay:var(--deal,0ms);-webkit-tap-highlight-color:transparent;}
+  .memory-card:hover{transform:translateY(-4px);box-shadow:0 18px 28px -14px rgba(139,110,232,.5)}
+  .memory-card:focus-visible{outline:4px solid #ff7eb8;outline-offset:4px}
+  .memory-card-face{position:absolute;inset:0;border-radius:inherit;display:grid;place-items:center;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .42s cubic-bezier(.2,.75,.25,1.35);}
+  .memory-card-back{font-size:clamp(28px,5vw,48px);color:#fff;background:linear-gradient(135deg,#ff8ec4 0%,#b07bff 48%,#6fb8ff 100%);border:3px solid rgba(255,255,255,.86);text-shadow:0 3px 10px rgba(90,55,150,.24);}
+  .memory-card-front{font-size:clamp(34px,6vw,58px);background:radial-gradient(circle at 35% 25%,#fff,#fff9df 60%,#dff8ee);transform:rotateY(180deg);border:3px solid #fff;}
+  .memory-card.is-open .memory-card-back,.memory-card.is-matched .memory-card-back{transform:rotateY(180deg)}
+  .memory-card.is-open .memory-card-front,.memory-card.is-matched .memory-card-front{transform:rotateY(360deg)}
+  .memory-card.is-matched{animation:gameMatch .55s ease both;box-shadow:0 0 0 4px rgba(88,214,168,.32),0 16px 28px -14px rgba(88,214,168,.7)}
+  .game-level{border:2px solid rgba(139,110,232,.16);background:rgba(255,255,255,.72);color:var(--ink);font-family:'Fredoka',sans-serif;font-weight:600;padding:9px 15px;border-radius:15px;cursor:pointer;transition:.2s;}
+  .game-level[aria-pressed="true"]{color:#fff;border-color:var(--lav-d);background:var(--lav-d);box-shadow:0 9px 18px -10px rgba(139,110,232,.8)}
+  .game-confetti{position:absolute;left:50%;top:50%;font-size:24px;pointer-events:none;animation:gameCelebrate .95s ease-out forwards;z-index:5}
+  .game-picker{border:2px solid rgba(255,255,255,.9);background:rgba(255,255,255,.7);color:var(--ink);font-family:'Fredoka',sans-serif;font-weight:600;font-size:clamp(14px,2vw,17px);padding:12px 20px;border-radius:18px;cursor:pointer;transition:transform .22s,box-shadow .22s,background .22s;box-shadow:0 10px 22px -16px rgba(74,63,107,.45)}
+  .game-picker:hover{transform:translateY(-3px)}
+  .game-picker[aria-selected="true"]{color:#fff;border-color:var(--lav-d);background:var(--lav-d);box-shadow:0 14px 26px -14px rgba(139,110,232,.9);transform:translateY(-2px)}
+  .pattern-sequence{display:flex;align-items:center;justify-content:center;gap:clamp(7px,1.6vw,14px);flex-wrap:nowrap;margin:clamp(18px,4vw,34px) auto;}
+  .pattern-item{width:clamp(50px,9vw,82px);aspect-ratio:1;display:grid;place-items:center;border-radius:clamp(15px,2vw,23px);font-size:clamp(28px,6vw,51px);background:linear-gradient(145deg,#fff,#fff7df);border:3px solid #fff;box-shadow:0 13px 25px -16px rgba(74,63,107,.5);animation:gameCardDeal .5s cubic-bezier(.2,.75,.25,1.2) both;animation-delay:var(--deal,0ms)}
+  .pattern-item.is-question{color:#fff;font-family:'Fredoka',sans-serif;font-weight:700;background:linear-gradient(135deg,#ff8ec4,#9b78ee);text-shadow:0 3px 9px rgba(74,63,107,.25)}
+  .pattern-choices{display:flex;justify-content:center;gap:clamp(10px,2vw,18px);flex-wrap:wrap;}
+  .pattern-choice{width:clamp(74px,14vw,108px);aspect-ratio:1;border:3px solid #fff;border-radius:clamp(20px,3vw,28px);cursor:pointer;font-size:clamp(38px,7vw,62px);background:linear-gradient(145deg,#fff,#eafaf4);box-shadow:0 15px 28px -16px rgba(74,63,107,.5);transition:transform .25s cubic-bezier(.2,.75,.25,1.35),box-shadow .25s;-webkit-tap-highlight-color:transparent}
+  .pattern-choice:hover{transform:translateY(-6px) scale(1.04);box-shadow:0 21px 32px -16px rgba(88,214,168,.65)}
+  .pattern-choice:focus-visible,.game-picker:focus-visible{outline:4px solid #ff7eb8;outline-offset:4px}
+  .pattern-choice.is-correct{animation:gameMatch .55s ease both;box-shadow:0 0 0 5px rgba(88,214,168,.34),0 18px 28px -14px rgba(88,214,168,.8)}
+  .pattern-choice.is-wrong{animation:gameMatch .35s ease both;box-shadow:0 0 0 4px rgba(255,126,184,.24)}
+  .feed-friend{width:clamp(130px,23vw,205px);aspect-ratio:1;display:grid;place-items:center;margin:18px auto 8px;border-radius:50%;font-size:clamp(76px,14vw,126px);background:radial-gradient(circle at 35% 25%,#fff 0%,#fff4c8 52%,#bfeedd 100%);border:5px solid #fff;box-shadow:0 24px 42px -22px rgba(60,160,130,.6);animation:floatYs 4s ease-in-out infinite;}
+  .food-choices{display:flex;align-items:center;justify-content:center;gap:clamp(12px,2.5vw,22px);flex-wrap:wrap;margin-top:20px;}
+  .food-choice{width:clamp(82px,15vw,116px);aspect-ratio:1;border:3px solid #fff;border-radius:50%;cursor:pointer;font-size:clamp(42px,8vw,68px);background:linear-gradient(145deg,#fff,#fff4d5);box-shadow:0 16px 30px -17px rgba(74,63,107,.5);transition:transform .25s cubic-bezier(.2,.75,.25,1.35),box-shadow .25s;animation:gameCardDeal .5s cubic-bezier(.2,.75,.25,1.2) both;animation-delay:var(--deal,0ms);-webkit-tap-highlight-color:transparent}
+  .food-choice:hover{transform:translateY(-7px) rotate(4deg) scale(1.06);box-shadow:0 22px 34px -17px rgba(255,170,80,.7)}
+  .food-choice:focus-visible{outline:4px solid var(--lav-d);outline-offset:4px}
+  .food-choice.is-correct{animation:gameMatch .55s ease both;box-shadow:0 0 0 5px rgba(88,214,168,.36),0 18px 30px -14px rgba(88,214,168,.8)}
+  .food-choice.is-wrong{animation:gameMatch .35s ease both;box-shadow:0 0 0 4px rgba(255,126,184,.24)}
+  @keyframes balloonSway{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-10px) rotate(3deg)}}
+  @keyframes balloonPop{0%{transform:scale(1);opacity:1}55%{transform:scale(1.28);opacity:.9}100%{transform:scale(.15);opacity:0}}
+  @keyframes balloonOops{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px) rotate(-4deg)}75%{transform:translateX(7px) rotate(4deg)}}
+  .balloon-field{display:grid;grid-template-columns:repeat(4,minmax(64px,108px));align-items:center;justify-content:center;gap:clamp(16px,3vw,30px);margin:clamp(24px,4vw,38px) auto;}
+  .pop-balloon{position:relative;width:100%;aspect-ratio:.82;border:0;background:transparent;cursor:pointer;padding:0;animation:balloonSway var(--sway,3.5s) ease-in-out var(--delay,0ms) infinite;transform-origin:50% 100%;-webkit-tap-highlight-color:transparent}
+  .pop-balloon::before{content:"";position:absolute;inset:0 5% 16%;border-radius:50% 50% 46% 46%;background:var(--balloon);box-shadow:inset 14px 10px 18px rgba(255,255,255,.35),inset -10px -12px 18px rgba(74,63,107,.12),0 17px 25px -15px rgba(74,63,107,.5);border:3px solid rgba(255,255,255,.66)}
+  .pop-balloon::after{content:"";position:absolute;left:50%;bottom:0;width:2px;height:22%;background:rgba(74,63,107,.3);transform:translateX(-50%);box-shadow:0 -8px 0 3px var(--balloon)}
+  .pop-balloon:hover{filter:brightness(1.05) saturate(1.08)}
+  .pop-balloon:focus-visible{outline:4px solid var(--lav-d);outline-offset:5px;border-radius:45%}
+  .pop-balloon.is-popped{animation:balloonPop .38s ease-out forwards;pointer-events:none}
+  .pop-balloon.is-oops{animation:balloonOops .35s ease both}
+  .colour-dot{display:inline-block;width:18px;height:18px;border-radius:50%;background:var(--dot);vertical-align:-3px;margin-right:5px;box-shadow:inset 2px 2px 4px rgba(255,255,255,.5)}
+  .mobile-motion-note{position:absolute;z-index:4;display:flex;align-items:center;gap:7px;padding:9px 11px;border-radius:16px;background:rgba(255,255,255,.78);border:1.5px solid rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 14px 28px -16px rgba(120,90,200,.55);font-family:'Fredoka',sans-serif;font-weight:600;font-size:11px;line-height:1.15;color:var(--ink);white-space:nowrap;}
+  [data-nav],[data-mobile-nav-link]{transition:color .22s ease,background .22s ease,transform .22s ease,box-shadow .22s ease !important;}
+  [data-nav]:hover{color:var(--lav-d) !important;background:rgba(139,110,232,.12) !important;transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgba(139,110,232,.12);}
+  [data-nav].is-active{color:#fff !important;background:var(--lav-d) !important;box-shadow:0 9px 20px -11px rgba(139,110,232,.9),inset 0 1px 0 rgba(255,255,255,.22);transform:none;}
+  [data-nav].is-active:hover{color:#fff !important;background:#7658d5 !important;transform:translateY(-1px);}
+  [data-mobile-nav-link]:hover{color:var(--lav-d) !important;background:rgba(139,110,232,.12) !important;transform:translateX(3px);}
+  [data-mobile-nav-link].is-active{color:#fff !important;background:var(--lav-d) !important;box-shadow:0 9px 20px -13px rgba(139,110,232,.85);}
+  [data-gallery-track]{display:flex !important;align-items:flex-start;align-content:flex-start;overflow-x:auto;overflow-y:hidden;gap:22px;padding:8px 2px 42px;scroll-snap-type:x mandatory;scroll-padding-inline:2px;scroll-behavior:smooth;scrollbar-width:none;overscroll-behavior-inline:contain;}
+  [data-gallery-track]::-webkit-scrollbar{display:none;}
+  [data-gallery-card]{flex:0 0 calc((100% - 66px)/4);height:300px !important;scroll-snap-align:start;border:0 !important;border-radius:24px !important;outline:0 !important;opacity:1 !important;transform:none !important;animation:none !important;box-shadow:0 24px 44px -30px rgba(74,63,107,.54),0 14px 26px -22px rgba(139,110,232,.45) !important;transition:box-shadow .35s ease,filter .35s ease !important;}
+  [data-gallery-card]{transform:none !important;}
+  [data-gallery-card] > img{transform:scale(1) !important;transform-origin:center center;transition:transform .75s cubic-bezier(.2,.75,.25,1),filter .75s ease !important;will-change:transform;}
+  [data-gallery-card]:hover > img,[data-gallery-card]:focus-within > img{transform:scale(1.075) !important;filter:saturate(1.08) brightness(1.03);}
+  [data-gallery-card] > div:last-child{left:12px !important;bottom:12px !important;padding:8px 13px !important;border:1px solid rgba(255,255,255,.75);box-shadow:0 8px 18px -12px rgba(38,26,66,.48);font-size:14px;}
+  [data-gallery-card]:hover,[data-gallery-card]:focus-within{transform:none !important;filter:saturate(1.05) brightness(1.02);box-shadow:0 31px 48px -28px rgba(74,63,107,.58),0 18px 30px -24px rgba(139,110,232,.52) !important;z-index:2;}
+  [data-gallery-wrap]{position:relative;padding:0 0 18px;background:transparent;border:0;border-radius:0;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .gallery-arrow{display:none !important;}
+  [data-gallery-prev]{left:13px;transform:translateY(-50%);}
+  [data-gallery-next]{right:13px;transform:translateY(-50%);}
+  .gallery-arrow:hover{background:#7658d5;box-shadow:0 20px 34px -13px rgba(74,63,107,.72);}
+  [data-gallery-prev]:hover{transform:translateY(-50%) scale(1.07);}
+  [data-gallery-next]:hover{transform:translateY(-50%) scale(1.07);}
+  .gallery-arrow:focus-visible{outline:4px solid #ff7eb8;outline-offset:3px;}
+  [data-gallery-dots]{position:absolute;right:4px;bottom:2px;display:flex;align-items:center;justify-content:flex-end;gap:8px;min-height:20px;padding:6px 8px;border-radius:999px;background:rgba(255,255,255,.42);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+  .gallery-dot{width:9px;height:9px;padding:0;border:0;border-radius:999px;cursor:pointer;background:rgba(139,110,232,.25);transition:width .3s cubic-bezier(.2,.75,.25,1.2),transform .3s,background .3s,box-shadow .3s;}
+  .gallery-dot:hover{background:rgba(139,110,232,.55);transform:scale(1.2);}
+  .gallery-dot.is-active{width:27px;background:var(--lav-d);box-shadow:0 5px 12px -5px rgba(139,110,232,.9);}
+  .gallery-dot:focus-visible{outline:3px solid #ff7eb8;outline-offset:3px;}
+  @media(max-width:520px){.memory-grid[data-pairs="3"],.memory-grid[data-pairs="6"]{grid-template-columns:repeat(3,minmax(58px,1fr));}.memory-grid[data-pairs="4"]{grid-template-columns:repeat(4,minmax(48px,1fr));}}
+  @media(max-width:520px){.balloon-field{grid-template-columns:repeat(4,minmax(52px,76px));gap:12px}.pop-balloon{aspect-ratio:.78}}
+  @media (max-width:1080px) and (min-width:860px){
+    [data-gallery-card]{flex-basis:calc((100% - 44px)/3);height:275px !important;}
+  }
+  [data-bento-grid]{
+    perspective:1600px;
+    perspective-origin:50% 38%;
+    align-items:stretch;
+  }
+  [data-bento-card]{
+    --mx:50%;
+    --my:50%;
+    backface-visibility:hidden;
+    outline:none;
+    will-change:transform,box-shadow,filter;
+  }
+  [data-bento-card]::after{
+    content:"";
+    position:absolute;
+    inset:1px;
+    border-radius:inherit;
+    background:linear-gradient(135deg,rgba(255,255,255,.6),rgba(255,255,255,0) 42%,rgba(255,255,255,.35));
+    opacity:0;
+    pointer-events:none;
+    transform:translateZ(10px);
+    transition:opacity .28s ease;
+    z-index:1;
+  }
+  [data-bento-card] > *{ z-index:2; }
+  [data-bento-card][data-bento-ready="1"]:not([data-bento-revealed="1"]){
+    transform:translate3d(0,54px,0) rotateX(-14deg) scale(.94);
+    filter:saturate(.96);
+  }
+  [data-bento-card][data-bento-revealed="1"]{
+    transform:translate3d(0,0,0) rotateX(0deg) scale(1);
+    filter:none;
+  }
+  [data-bento-card][data-bento-hover="1"],
+  [data-bento-card]:focus-visible{
+    box-shadow:0 42px 72px -30px rgba(120,90,200,.5), 0 18px 32px -22px rgba(255,120,180,.45), inset 0 1px 0 rgba(255,255,255,.98) !important;
+  }
+  [data-bento-card][data-bento-hover="1"]::after,
+  [data-bento-card]:focus-visible::after{ opacity:.75; }
+  [data-bento-card]:focus-visible{
+    outline:3px solid rgba(255,126,184,.78);
+    outline-offset:5px;
+  }
+  [data-bento-glow]{
+    background:
+      radial-gradient(260px circle at var(--mx) var(--my), rgba(255,255,255,.95), rgba(255,255,255,.24) 38%, rgba(255,255,255,0) 70%),
+      radial-gradient(380px circle at var(--mx) var(--my), rgba(255,126,184,.28), rgba(139,110,232,0) 72%) !important;
+    transition:none !important;
+  }
+  [data-bento-icon]{
+    will-change:transform,filter;
+    transform-origin:50% 58%;
+  }
+  [data-bento-card][data-bento-hover="1"] [data-bento-icon],
+  [data-bento-card]:focus-visible [data-bento-icon]{
+    filter:saturate(1.15) drop-shadow(0 18px 18px rgba(120,90,200,.2));
+  }
+  @media (min-width:760px){
+    [data-bento-wide]{ grid-column:span 2 !important; }
+  }
+  @media (max-width:760px){
+    [data-bento-grid]{ grid-template-columns:1fr !important; perspective:900px; }
+    [data-bento-card]{
+      grid-column:span 1 !important;
+      min-height:210px !important;
+      border-radius:24px !important;
+    }
+    [data-bento-card][data-bento-ready="1"]:not([data-bento-revealed="1"]){
+      transform:translate3d(0,34px,0) scale(.98);
+    }
+  }
+  @media (max-width:859px){
+    [data-desktop-cloud]{display:none !important;}
+    [data-mobile-nav]{padding:10px 12px !important;}
+    [data-nav-shell]{gap:8px !important;padding:8px 10px 8px 12px !important;border-radius:22px !important;}
+    [data-nav-brand]{gap:10px !important;min-width:0;}
+    [data-menu-toggle]{display:flex !important;flex-direction:column;align-items:center;justify-content:center;gap:3px !important;width:44px !important;height:44px !important;flex:0 0 44px;}
+    [data-menu-toggle] > span{flex:0 0 3px;margin:0 !important;}
+    [data-mobile-menu-panel]{gap:4px !important;padding:10px !important;margin-top:7px !important;}
+    [data-mobile-hero]{padding:20px 16px 38px !important;}
+    [data-hero-layout]{align-items:stretch !important;gap:20px !important;}
+    [data-hero-copy]{flex:1 1 100% !important;min-width:0 !important;width:100%;}
+    [data-hero-actions]{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px !important;width:100%;}
+    [data-hero-actions] > a{width:100%;min-width:0;justify-content:center;padding:15px 11px !important;font-size:16px !important;gap:8px !important;white-space:nowrap;}
+    [data-hero-actions] > a > span:first-child{font-size:19px !important;}
+    [data-trust-row]{gap:10px !important;margin-top:20px !important;}
+    [data-hero-image]{flex:1 1 100% !important;min-width:0 !important;width:100%;margin-top:42px;}
+    [data-mobile-minds]{top:-17%;left:-9%;animation:floatY 5.8s ease-in-out infinite;}
+    [data-mobile-trust]{right:-10%;bottom:7%;animation:floatYs 5.2s ease-in-out .6s infinite;}
+    [data-gallery-wrap]{padding:0 0 14px;border-radius:0;}
+    [data-gallery-track]{gap:14px;padding:6px 1px 38px;scroll-padding-inline:1px;}
+    [data-gallery-card]{flex-basis:min(78vw,300px);height:255px !important;border:0 !important;}
+    [data-gallery-prev]{left:4px;}
+    [data-gallery-next]{right:4px;}
+    .gallery-arrow{width:42px;height:42px;font-size:23px;}
+    [data-gallery-dots]{right:0;bottom:0;}
+  }
+  @media (max-width:430px){
+    [data-nav-brand] > span:first-child{width:42px !important;height:42px !important;border-radius:14px !important;}
+    [data-nav-brand] strong{font-size:16px !important;}
+    [data-nav-brand] > span:last-child > span{font-size:9.5px !important;letter-spacing:1.8px !important;}
+    [data-hero-badge]{padding:8px 13px !important;gap:7px !important;font-size:12px !important;}
+    [data-hero-title-main]{font-size:clamp(50px,15vw,58px) !important;}
+    [data-hero-title-sub]{font-size:19px !important;letter-spacing:2px !important;}
+    [data-hero-text]{font-size:15px !important;line-height:1.62 !important;}
+    [data-hero-actions]{grid-template-columns:1fr;}
+    [data-hero-actions] > a{padding:14px 16px !important;}
+    [data-trust-row] strong{font-size:14px !important;}
+    [data-mobile-minds]{left:-3%;}
+    [data-mobile-trust]{right:-3%;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+    [data-bento-card]{
+      transform:none !important;
+      filter:none !important;
+    }
+    .memory-card,.memory-card-face,.game-confetti{animation:none !important;transition:none !important;}
+  }
+</style>
+</helmet>
+
+<div data-root style="font-family:'Nunito',sans-serif; color:var(--ink); position:relative; overflow-x:clip; background:
+  radial-gradient(1100px 700px at 12% -8%, #ffe7f4 0%, transparent 55%),
+  radial-gradient(1000px 720px at 92% 4%, #e3effe 0%, transparent 55%),
+  radial-gradient(900px 800px at 50% 108%, #e9fbf2 0%, transparent 60%),
+  linear-gradient(180deg,#fdf4fb 0%, #f3f1fe 50%, #eef9f6 100%);">
+
+  <!-- ====== DECORATIVE BACKDROP ====== -->
+  <div aria-hidden="true" style="position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:0;">
+    <div style="position:absolute; top:14%; left:6%; width:120px; height:120px; border-radius:50%; background:radial-gradient(circle at 32% 28%, #fff 0%, rgba(255,174,212,.6) 40%, rgba(255,174,212,.15) 70%); animation:floatY 7s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:62%; left:3%; width:70px; height:70px; border-radius:50%; background:radial-gradient(circle at 32% 28%, #fff 0%, rgba(159,214,245,.6) 42%, transparent 72%); animation:floatYs 5.5s ease-in-out infinite;"></div>
+    <div style="position:absolute; top:30%; right:5%; width:90px; height:90px; border-radius:50%; background:radial-gradient(circle at 32% 28%, #fff 0%, rgba(159,231,201,.6) 42%, transparent 72%); animation:floatY 8s ease-in-out .6s infinite;"></div>
+    <div style="position:absolute; top:80%; right:9%; width:54px; height:54px; border-radius:50%; background:radial-gradient(circle at 32% 28%, #fff 0%, rgba(255,227,154,.7) 45%, transparent 75%); animation:floatYs 6s ease-in-out .3s infinite;"></div>
+    <div style="position:absolute; top:9%; left:42%; font-size:40px; color:#ffd45e; animation:twinkle 3.2s ease-in-out infinite; text-shadow:0 4px 14px rgba(255,200,80,.5);">★</div>
+    <div style="position:absolute; top:48%; left:88%; font-size:26px; color:#ff9ecb; animation:twinkle 2.6s ease-in-out .8s infinite;">★</div>
+    <div style="position:absolute; top:74%; left:46%; font-size:30px; color:#9ab8ff; animation:twinkle 3.6s ease-in-out .4s infinite;">✦</div>
+    <div style="position:absolute; top:20%; left:74%; font-size:28px; color:#ff86b6; animation:bob 5s ease-in-out infinite;">♥</div>
+    <div style="position:absolute; top:88%; left:24%; font-size:24px; color:#ff9ecb; animation:bob 4.4s ease-in-out .5s infinite;">♥</div>
+    <div data-desktop-cloud style="position:absolute; top:6%; left:16%; width:150px; height:54px; background:#fff; border-radius:40px; filter:blur(.4px); box-shadow:34px 6px 0 -8px #fff, -30px 8px 0 -6px #fff; opacity:.7; animation:drift 14s ease-in-out infinite;"></div>
+    <div data-desktop-cloud style="position:absolute; top:40%; right:16%; width:120px; height:44px; background:#fff; border-radius:40px; box-shadow:28px 6px 0 -8px #fff, -24px 6px 0 -6px #fff; opacity:.6; animation:drift 18s ease-in-out 1s infinite;"></div>
+  </div>
+
+  <!-- ====== NAV ====== -->
+  <nav data-mobile-nav style="position:sticky; top:0; z-index:40; padding:14px clamp(16px,4vw,46px);">
+    <div data-nav-shell style="max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:16px;
+      background:var(--glass); border:1.5px solid var(--glass-brd); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px);
+      border-radius:26px; padding:10px 14px 10px 16px; box-shadow:0 14px 40px -18px rgba(120,90,200,.45), inset 0 1px 0 rgba(255,255,255,.7);">
+      <a data-nav-brand href="#home" style="display:flex; align-items:center; gap:12px; text-decoration:none; color:inherit;">
+        <span style="width:46px; height:46px; border-radius:16px; display:grid; place-items:center; font-size:24px;
+          background:conic-gradient(from 210deg, #ffb3d9, #ffd59a, #a8e6cf, #9fd6f5, #c5b3ff, #ffb3d9); box-shadow:0 8px 18px -6px rgba(180,120,220,.6);">🧸</span>
+        <span style="display:flex; flex-direction:column; line-height:1.44;">
+          <strong style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:18px; letter-spacing:.2px;">Children</strong>
+          <span style="font-size:11px; font-weight:700; letter-spacing:2.4px; color:var(--ink-soft); text-transform:uppercase;">Day Care Center</span>
+        </span>
+      </a>
+
+      <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex; align-items:center; gap:6px;">
+          <a href="#home" data-nav data-section="home" class="is-active" aria-current="page" style="text-decoration:none; color:var(--ink); font-weight:700; font-size:15px; padding:9px 14px; border-radius:14px; transition:.25s;">Home</a>
+          <a href="#why" data-nav data-section="why" style="text-decoration:none; color:var(--ink); font-weight:700; font-size:15px; padding:9px 14px; border-radius:14px; transition:.25s;">Why Us</a>
+          <a href="#activities" data-nav data-section="activities" style="text-decoration:none; color:var(--ink); font-weight:700; font-size:15px; padding:9px 14px; border-radius:14px; transition:.25s;">Activities</a>
+          <a href="#play" data-nav data-section="play" style="text-decoration:none; color:var(--ink); font-weight:700; font-size:15px; padding:9px 14px; border-radius:14px; transition:.25s;">Play</a>
+          <a href="#gallery" data-nav data-section="gallery" style="text-decoration:none; color:var(--ink); font-weight:700; font-size:15px; padding:9px 14px; border-radius:14px; transition:.25s;">Gallery</a>
+          <a href="#contact" data-nav data-section="contact" style="text-decoration:none; color:var(--ink); font-weight:700; font-size:15px; padding:9px 14px; border-radius:14px; transition:.25s;">Contact</a>
+          <a href="{{ telHref }}" aria-label="Call the day care center now" style="margin-left:8px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; font-family:'Fredoka',sans-serif; font-weight:600; color:#fff; padding:11px 20px; border-radius:16px; position:relative; overflow:hidden;
+            background:linear-gradient(135deg,#ff8ec4,#ff6fae); box-shadow:0 12px 26px -10px rgba(255,110,170,.85);" style-hover="transform:translateY(-2px)">
+            <span style="font-size:16px;">📞</span> Call Now
+            <span aria-hidden="true" style="position:absolute; top:0; left:0; width:40%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent); animation:shine 3.4s ease-in-out infinite;"></span>
+          </a>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+        <button data-menu-toggle onClick="{{ toggleMenu }}" aria-label="Open menu" aria-expanded="{{ menuOpen }}" style="border:none; cursor:pointer; width:48px; height:48px; border-radius:15px; display:grid; place-items:center; gap:5px; background:rgba(255,255,255,.7); box-shadow:0 6px 16px -8px rgba(120,90,200,.5);">
+          <span style="display:block; width:22px; height:3px; border-radius:3px; background:var(--lav-d);"></span>
+          <span style="display:block; width:22px; height:3px; border-radius:3px; background:var(--pink-d);"></span>
+          <span style="display:block; width:22px; height:3px; border-radius:3px; background:var(--mint);"></span>
+        </button>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+      <div data-mobile-menu-panel style="max-width:1200px; margin:10px auto 0; display:flex; flex-direction:column; gap:6px; padding:14px;
+        background:var(--glass); border:1.5px solid var(--glass-brd); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-radius:22px; box-shadow:0 18px 40px -18px rgba(120,90,200,.5); animation:popIn .3s ease both;">
+        <a href="#home" data-mobile-nav-link data-section="home" class="is-active" aria-current="page" onClick="{{ closeMenu }}" style="text-decoration:none; color:var(--ink); font-weight:700; padding:13px 14px; border-radius:14px; background:rgba(255,255,255,.55);">🏠 Home</a>
+        <a href="#why" data-mobile-nav-link data-section="why" onClick="{{ closeMenu }}" style="text-decoration:none; color:var(--ink); font-weight:700; padding:13px 14px; border-radius:14px; background:rgba(255,255,255,.55);">💜 Why Us</a>
+        <a href="#activities" data-mobile-nav-link data-section="activities" onClick="{{ closeMenu }}" style="text-decoration:none; color:var(--ink); font-weight:700; padding:13px 14px; border-radius:14px; background:rgba(255,255,255,.55);">🎨 Activities</a>
+        <a href="#play" data-mobile-nav-link data-section="play" onClick="{{ closeMenu }}" style="text-decoration:none; color:var(--ink); font-weight:700; padding:13px 14px; border-radius:14px; background:rgba(255,255,255,.55);">🌈 Play a Game</a>
+        <a href="#gallery" data-mobile-nav-link data-section="gallery" onClick="{{ closeMenu }}" style="text-decoration:none; color:var(--ink); font-weight:700; padding:13px 14px; border-radius:14px; background:rgba(255,255,255,.55);">📸 Gallery</a>
+        <a href="#contact" data-mobile-nav-link data-section="contact" onClick="{{ closeMenu }}" style="text-decoration:none; color:var(--ink); font-weight:700; padding:13px 14px; border-radius:14px; background:rgba(255,255,255,.55);">📍 Contact</a>
+        <a href="{{ telHref }}" style="text-decoration:none; text-align:center; color:#fff; font-family:'Fredoka',sans-serif; font-weight:600; padding:14px; border-radius:16px; background:linear-gradient(135deg,#ff8ec4,#ff6fae); box-shadow:0 12px 24px -10px rgba(255,110,170,.8);">📞 Call Now</a>
+      </div>
+    </sc-if>
+  </nav>
+
+  <!-- ====== HERO ====== -->
+  <header id="home" data-mobile-hero style="position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:clamp(20px,4vw,48px) clamp(18px,4vw,46px) clamp(40px,6vw,72px);">
+    <div data-hero-layout style="display:flex; flex-wrap:wrap; align-items:center; gap:clamp(28px,4vw,56px);">
+      <div data-hero-copy style="flex:1 1 400px; min-width:min(100%,360px);">
+    <span data-reveal data-hero-badge style="display:inline-flex; align-items:center; gap:9px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:clamp(13px,2vw,16px); color:var(--lav-d); padding:9px 20px; border-radius:30px; background:rgba(255,255,255,.7); border:1.5px solid #fff; box-shadow:0 8px 22px -12px rgba(150,110,232,.6);">
+      <span style="font-size:16px;">🌈</span> Nurturing Today, Inspiring Tomorrow
+    </span>
+
+    <h1 style="font-family:'Fredoka',sans-serif; font-weight:700; margin:clamp(14px,2.5vw,22px) 0 0; line-height:.94; letter-spacing:-1px;">
+      <span data-reveal data-hero-title-main style="display:block; font-size:clamp(56px,9vw,118px); background:linear-gradient(120deg,#ff7eb8 0%, #c08bff 38%, #6fb8ff 70%, #58d6a8 100%); -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 14px 26px rgba(190,120,230,.28));">Children</span>
+      <span data-reveal data-hero-title-sub style="display:block; font-size:clamp(22px,4vw,46px); font-weight:600; color:var(--ink); letter-spacing:3px; text-transform:uppercase; margin-top:2px;">Day Care Center</span>
+    </h1>
+
+    <p data-reveal data-hero-text style="max-width:520px; margin:clamp(16px,2.4vw,22px) 0 0; font-size:clamp(15px,2.1vw,19px); line-height:1.7; color:var(--ink-soft); font-weight:600;">
+      A safe, happy and nurturing place where little ones learn through play, creative activities, storytime, puzzles and friendly care.
+    </p>
+
+    <div data-reveal data-hero-actions style="display:flex; flex-wrap:wrap; gap:14px; margin-top:clamp(22px,3vw,32px);">
+      <a href="{{ waHref }}" target="_blank" rel="noopener" aria-label="Message us on WhatsApp" style="position:relative; overflow:hidden; text-decoration:none; display:inline-flex; align-items:center; gap:10px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:18px; color:#fff; padding:16px 30px; border-radius:20px;
+        background:linear-gradient(135deg,var(--wa),var(--wa-d)); box-shadow:0 18px 36px -14px rgba(45,168,87,.9);" style-hover="transform:translateY(-3px)">
+        <span style="font-size:22px;">💬</span> WhatsApp Us
+        <span aria-hidden="true" style="position:absolute; top:0; left:0; width:38%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); animation:shine 3.6s ease-in-out infinite;"></span>
+      </a>
+      <a href="#activities" style="position:relative; overflow:hidden; text-decoration:none; display:inline-flex; align-items:center; gap:10px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:18px; color:#fff; padding:16px 30px; border-radius:20px;
+        background:linear-gradient(135deg,#b07bff,#8b6ee8); box-shadow:0 18px 36px -14px rgba(140,110,232,.85);" style-hover="transform:translateY(-3px)">
+        <span style="font-size:22px;">🎨</span> Explore Activities
+        <span aria-hidden="true" style="position:absolute; top:0; left:0; width:38%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent); animation:shine 4.2s ease-in-out 1s infinite;"></span>
+      </a>
+    </div>
+
+        <!-- trust row -->
+        <div data-reveal data-trust-row style="display:flex; align-items:center; gap:13px; margin-top:clamp(20px,2.6vw,28px);">
+          <div aria-label="A few members of our parent community" style="display:flex;">
+            <span title="AK" aria-label="Community member AK" style="width:40px; height:40px; flex:0 0 40px; border-radius:50%; border:3px solid #fff; display:grid; place-items:center; font-family:'Fredoka',sans-serif; font-weight:700; font-size:11px; color:#fff; background:linear-gradient(135deg,#ff8ec4,#b07bff); box-shadow:0 5px 12px -5px rgba(120,90,200,.6);">AK</span>
+            <span title="NM" aria-label="Community member NM" style="width:40px; height:40px; flex:0 0 40px; border-radius:50%; margin-left:-13px; border:3px solid #fff; display:grid; place-items:center; font-family:'Fredoka',sans-serif; font-weight:700; font-size:11px; color:#fff; background:linear-gradient(135deg,#59d5a7,#6fa8f5); box-shadow:0 5px 12px -5px rgba(120,90,200,.6);">NM</span>
+            <span title="RS" aria-label="Community member RS" style="width:40px; height:40px; flex:0 0 40px; border-radius:50%; margin-left:-13px; border:3px solid #fff; display:grid; place-items:center; font-family:'Fredoka',sans-serif; font-weight:700; font-size:11px; color:#fff; background:linear-gradient(135deg,#ffd45e,#ff8f70); box-shadow:0 5px 12px -5px rgba(120,90,200,.6);">RS</span>
+            <span title="More than 20 parents" aria-label="More than 20 parent community members" style="width:40px; height:40px; flex:0 0 40px; border-radius:50%; margin-left:-13px; border:3px solid #fff; display:grid; place-items:center; font-family:'Fredoka',sans-serif; font-weight:700; font-size:10px; color:var(--ink); background:linear-gradient(135deg,#fff,#e5dcff); box-shadow:0 5px 12px -5px rgba(120,90,200,.6);">20+</span>
+          </div>
+          <strong style="font-family:'Nunito',sans-serif; font-weight:800; font-size:15px; color:var(--ink);">Trusted by 20+ Parents <span style="color:var(--pink-d);">♥</span></strong>
+        </div>
+      </div>
+
+      <!-- IMAGE COLUMN -->
+      <div data-hero-image style="flex:1 1 360px; min-width:min(100%,280px); display:flex; justify-content:center; position:relative;">
+        <div style="position:relative; width:clamp(260px,34vw,400px); max-width:100%; aspect-ratio:17 / 20;">
+          <div data-heart-lock-ring aria-hidden="true" style="position:absolute;z-index:0;top:-15%;left:50%;transform:translateX(-50%);width:55%;height:30%;border:clamp(13px,1.5vw,18px) solid #ff9ecb;border-bottom:none;border-radius:999px 999px 0 0;opacity:.34;box-sizing:border-box;animation:lockFloat 6s ease-in-out infinite;"></div>
+          <div aria-hidden="true" style="position:absolute; inset:-3.2%; -webkit-mask:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2029.6%22%3E%3Cpath%20d=%22M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z%22/%3E%3C/svg%3E') center / 100% 100% no-repeat; mask:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2029.6%22%3E%3Cpath%20d=%22M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z%22/%3E%3C/svg%3E') center / 100% 100% no-repeat; background:linear-gradient(135deg,#ff9ecb,#ffd59a 48%,#9fd6f5); animation:floatYs 6s ease-in-out infinite;"></div>
+          <img src="assets/hero-child.png" alt="A delighted child showing off colourful paint-covered hands at the day care center" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:50% 28%; -webkit-mask:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2029.6%22%3E%3Cpath%20d=%22M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z%22/%3E%3C/svg%3E') center / 100% 100% no-repeat; mask:url('data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2032%2029.6%22%3E%3Cpath%20d=%22M23.6,0c-3.4,0-6.3,2.7-7.6,5.6C14.7,2.7,11.8,0,8.4,0C3.8,0,0,3.8,0,8.4c0,9.4,9.5,11.9,16,21.2c6.1-9.3,16-12.1,16-21.2C32,3.8,28.2,0,23.6,0z%22/%3E%3C/svg%3E') center / 100% 100% no-repeat;">
+          <div aria-hidden="true" style="position:absolute; top:-5%; left:3%; font-size:30px; color:#ffd45e; text-shadow:0 4px 12px rgba(255,200,80,.5); animation:twinkle 3s ease-in-out infinite;">★</div>
+          <div aria-hidden="true" style="position:absolute; bottom:4%; left:-7%; font-size:24px; color:#ff86b6; animation:bob 4.6s ease-in-out infinite;">♥</div>
+          <div aria-hidden="true" style="position:absolute; bottom:3%; right:-9%; width:84px; height:50px; background:#fff; border-radius:40px; box-shadow:0 12px 26px -12px rgba(120,90,200,.5), 22px 2px 0 -6px #fff, -20px 6px 0 -4px #fff; display:flex; align-items:center; justify-content:center; gap:10px; animation:floatY 6.5s ease-in-out infinite;">
+            <span style="width:6px; height:8px; border-radius:50%; background:#6f6593;"></span>
+            <span style="width:6px; height:8px; border-radius:50%; background:#6f6593;"></span>
+          </div>
+
+          <!-- compact floating messages for mobile -->
+          <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+            <div aria-hidden="true">
+              <div data-mobile-minds class="mobile-motion-note">
+                <span style="font-size:18px;">🌱</span><span>Little Minds<br>Grow Big</span>
+              </div>
+              <div data-mobile-trust class="mobile-motion-note">
+                <span style="font-size:18px;">💛</span><span>Parents<br>Trust Us</span>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- floating motion cards (desktop only) -->
+          <sc-if value="{{ isDesktop }}" hint-placeholder-val="{{ true }}">
+            <div aria-hidden="true">
+              <div style="position:absolute; top:-2%; left:-26%; display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:20px; background:var(--glass); border:1.5px solid var(--glass-brd); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 18px 38px -16px rgba(120,90,200,.5); animation:floatY 6s ease-in-out infinite;">
+                <span style="font-size:22px;">🌱</span><strong style="font-family:'Fredoka',sans-serif; font-size:13.5px; color:var(--ink); white-space:nowrap; line-height:1.2;">Little Minds<br>Grow Big</strong>
+              </div>
+              <div style="position:absolute; bottom:6%; left:-28%; display:flex; align-items:center; gap:10px; padding:12px 16px; border-radius:20px; background:var(--glass); border:1.5px solid var(--glass-brd); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); box-shadow:0 18px 38px -16px rgba(120,90,200,.5); animation:floatYs 5.4s ease-in-out .8s infinite;">
+                <span style="font-size:22px;">💛</span><strong style="font-family:'Fredoka',sans-serif; font-size:13.5px; color:var(--ink); white-space:nowrap; line-height:1.2;">Parents<br>Trust Us</strong>
+              </div>
+              <div style="position:absolute; top:38%; right:-24%; padding:12px 18px; border-radius:20px; background:linear-gradient(135deg,#ff9ecb,#9fd6f5); border:1.5px solid rgba(255,255,255,.7); box-shadow:0 18px 40px -16px rgba(120,90,200,.55); animation:floatY 6.6s ease-in-out .4s infinite;">
+                <strong style="font-family:'Fredoka',sans-serif; font-size:13.5px; color:#fff; text-shadow:0 1px 4px rgba(160,90,160,.4); white-space:nowrap; line-height:1.2;">Play • Learn<br>Grow • Shine</strong>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ====== WHY US ====== -->
+  <section id="why" style="position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:clamp(40px,6vw,72px) clamp(18px,4vw,46px);">
+    <div data-reveal style="text-align:center; margin-bottom:clamp(28px,4vw,46px);">
+      <span style="font-family:'Fredoka',sans-serif; font-weight:600; color:var(--pink-d); letter-spacing:1px;">💜 WHY PARENTS CHOOSE US</span>
+      <h2 style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(30px,5vw,52px); margin:8px 0 0; color:var(--ink);">A place parents <span style="color:var(--lav-d);">truly trust</span></h2>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:clamp(16px,2.4vw,26px);">
+      <div data-reveal data-tilt style="--g1:#ffd9ec; --g2:#ffb3d9; background:#fff; border-radius:28px; padding:30px 26px; box-shadow:0 26px 50px -28px rgba(150,110,200,.5), inset 0 1px 0 #fff; border:1px solid rgba(255,255,255,.9); transition:transform .25s, box-shadow .25s;" style-hover="transform:translateY(-10px); box-shadow:0 38px 60px -28px rgba(255,130,180,.6)">
+        <div style="width:64px; height:64px; border-radius:20px; display:grid; place-items:center; font-size:30px; background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 14px 26px -10px var(--g2); margin-bottom:18px;">🛡️</div>
+        <h3 style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:21px; margin:0 0 8px;">Safe &amp; Secure</h3>
+        <p style="margin:0; color:var(--ink-soft); font-weight:600; line-height:1.6; font-size:15px;">Childproofed spaces, secure entry and watchful eyes — your little one is always protected.</p>
+      </div>
+      <div data-reveal data-tilt style="--g1:#e0d4ff; --g2:#b9a7f3; background:#fff; border-radius:28px; padding:30px 26px; box-shadow:0 26px 50px -28px rgba(150,110,200,.5), inset 0 1px 0 #fff; border:1px solid rgba(255,255,255,.9); transition:transform .25s, box-shadow .25s;" style-hover="transform:translateY(-10px); box-shadow:0 38px 60px -28px rgba(150,110,232,.6)">
+        <div style="width:64px; height:64px; border-radius:20px; display:grid; place-items:center; font-size:30px; background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 14px 26px -10px var(--g2); margin-bottom:18px;">🤗</div>
+        <h3 style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:21px; margin:0 0 8px;">Caring Staff</h3>
+        <p style="margin:0; color:var(--ink-soft); font-weight:600; line-height:1.6; font-size:15px;">Warm, trained carers who treat every child with patience, kindness and a big smile.</p>
+      </div>
+      <div data-reveal data-tilt style="--g1:#c9f3e3; --g2:#9fe7c9; background:#fff; border-radius:28px; padding:30px 26px; box-shadow:0 26px 50px -28px rgba(150,110,200,.5), inset 0 1px 0 #fff; border:1px solid rgba(255,255,255,.9); transition:transform .25s, box-shadow .25s;" style-hover="transform:translateY(-10px); box-shadow:0 38px 60px -28px rgba(80,200,150,.55)">
+        <div style="width:64px; height:64px; border-radius:20px; display:grid; place-items:center; font-size:30px; background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 14px 26px -10px var(--g2); margin-bottom:18px;">🧩</div>
+        <h3 style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:21px; margin:0 0 8px;">Learning Through Play</h3>
+        <p style="margin:0; color:var(--ink-soft); font-weight:600; line-height:1.6; font-size:15px;">Play-based learning that grows curiosity, confidence and little problem-solving minds.</p>
+      </div>
+      <div data-reveal data-tilt style="--g1:#ffe7bd; --g2:#ffd59a; background:#fff; border-radius:28px; padding:30px 26px; box-shadow:0 26px 50px -28px rgba(150,110,200,.5), inset 0 1px 0 #fff; border:1px solid rgba(255,255,255,.9); transition:transform .25s, box-shadow .25s;" style-hover="transform:translateY(-10px); box-shadow:0 38px 60px -28px rgba(240,180,80,.55)">
+        <div style="width:64px; height:64px; border-radius:20px; display:grid; place-items:center; font-size:30px; background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 14px 26px -10px var(--g2); margin-bottom:18px;">🎨</div>
+        <h3 style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:21px; margin:0 0 8px;">Creative Activities</h3>
+        <p style="margin:0; color:var(--ink-soft); font-weight:600; line-height:1.6; font-size:15px;">Painting, crafts, music and stories that spark imagination every single day.</p>
+      </div>
+      <div data-reveal data-tilt style="--g1:#bfe6fb; --g2:#9fd6f5; background:#fff; border-radius:28px; padding:30px 26px; box-shadow:0 26px 50px -28px rgba(150,110,200,.5), inset 0 1px 0 #fff; border:1px solid rgba(255,255,255,.9); transition:transform .25s, box-shadow .25s;" style-hover="transform:translateY(-10px); box-shadow:0 38px 60px -28px rgba(80,170,240,.55)">
+        <div style="width:64px; height:64px; border-radius:20px; display:grid; place-items:center; font-size:30px; background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 14px 26px -10px var(--g2); margin-bottom:18px;">🎈</div>
+        <h3 style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:21px; margin:0 0 8px;">Fun Environment</h3>
+        <p style="margin:0; color:var(--ink-soft); font-weight:600; line-height:1.6; font-size:15px;">Bright, joyful rooms full of toys, color and laughter where children love to be.</p>
+      </div>
+      <div data-reveal data-tilt style="--g1:#ffd3c9; --g2:#ffc9a8; background:#fff; border-radius:28px; padding:30px 26px; box-shadow:0 26px 50px -28px rgba(150,110,200,.5), inset 0 1px 0 #fff; border:1px solid rgba(255,255,255,.9); transition:transform .25s, box-shadow .25s;" style-hover="transform:translateY(-10px); box-shadow:0 38px 60px -28px rgba(255,150,110,.55)">
+        <div style="width:64px; height:64px; border-radius:20px; display:grid; place-items:center; font-size:30px; background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 14px 26px -10px var(--g2); margin-bottom:18px;">🧼</div>
+        <h3 style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:21px; margin:0 0 8px;">Hygiene &amp; Cleanliness</h3>
+        <p style="margin:0; color:var(--ink-soft); font-weight:600; line-height:1.6; font-size:15px;">Spotless rooms, clean toys and healthy routines that keep every child happy and well.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ACTIVITIES (3D Bento) ====== -->
+  <section id="activities" style="position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:clamp(50px,7vw,90px) clamp(18px,4vw,46px);">
+    <div data-reveal style="text-align:center; margin-bottom:clamp(28px,4vw,46px);">
+      <span style="display:inline-flex; align-items:center; gap:8px; font-family:'Fredoka',sans-serif; font-weight:600; color:var(--lav-d); letter-spacing:1.6px; font-size:13px; padding:7px 16px; border-radius:30px; background:rgba(255,255,255,.7); border:1.5px solid #fff; box-shadow:0 8px 22px -12px rgba(150,110,232,.5);">✨ OUR ACTIVITIES</span>
+      <h2 style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(32px,5.4vw,56px); margin:14px 0 0; color:var(--ink); letter-spacing:-.5px;">Every day is an <span style="background:linear-gradient(120deg,#ff7eb8,#c08bff 60%,#6fb8ff); -webkit-background-clip:text; background-clip:text; color:transparent;">adventure</span></h2>
+      <p style="margin:10px 0 0; color:var(--ink-soft); font-weight:600; font-size:15px;">Play, create, sing and grow in bright little moments.</p>
+    </div>
+
+    <div data-bento-grid role="list" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr)); grid-auto-flow:dense; gap:clamp(14px,2vw,22px); perspective:1500px;">
+
+      <!-- 1. Puzzle Play -->
+      <div data-bento-card role="listitem" tabindex="0" style="grid-column:span 1; position:relative; overflow:hidden; border-radius:30px; padding:clamp(24px,2.6vw,30px); min-height:240px; background:radial-gradient(120% 100% at 0% 0%, #ffe7c2 0%, transparent 55%), radial-gradient(110% 100% at 100% 30%, #ffd0e6 0%, transparent 60%), radial-gradient(120% 120% at 50% 110%, #fff3d7 0%, transparent 55%), #ffffff; border:1.5px solid rgba(255,255,255,.95); box-shadow:0 30px 60px -34px rgba(255,150,110,.55), 0 8px 20px -14px rgba(150,110,200,.4), inset 0 1px 0 rgba(255,255,255,.95); transform-style:preserve-3d; transition:box-shadow .35s, transform .55s cubic-bezier(.34,1.56,.64,1); isolation:isolate; cursor:pointer;">
+        <div data-bento-glow aria-hidden="true" style="position:absolute; inset:0; background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.85), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .35s; pointer-events:none; mix-blend-mode:soft-light;"></div>
+        <div data-bento-icon style="position:relative; display:grid; place-items:center; width:78px; height:78px; border-radius:24px; background:linear-gradient(135deg,#ffd59a,#ff9ecb); border:2px solid #fff; box-shadow:0 16px 28px -10px rgba(255,150,140,.55), inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 rgba(0,0,0,.04); font-size:40px; transform:translateZ(40px); transition:transform .45s cubic-bezier(.34,1.56,.64,1);">🧩</div>
+        <h3 style="position:relative; font-family:'Fredoka',sans-serif; font-weight:600; font-size:22px; margin:20px 0 8px; color:var(--ink); transform:translateZ(22px);">Puzzle Play</h3>
+        <p style="position:relative; margin:0; color:var(--ink); opacity:.74; font-weight:600; font-size:14.5px; line-height:1.6; max-width:30ch; transform:translateZ(14px);">Brain-teasing fun that grows focus, patience and clever little minds.</p>
+        <span aria-hidden="true" style="position:absolute; bottom:-30px; right:-22px; font-size:150px; opacity:.08; pointer-events:none;">🧩</span>
+      </div>
+
+      <!-- 2. Painting & Drawing (WIDE) -->
+      <div data-bento-card data-bento-wide role="listitem" tabindex="0" style="grid-column:span 2; position:relative; overflow:hidden; border-radius:30px; padding:clamp(24px,2.6vw,32px); min-height:240px; background:radial-gradient(110% 100% at 8% 10%, #ffd9ec 0%, transparent 55%), radial-gradient(90% 90% at 96% 14%, #d9c8ff 0%, transparent 60%), radial-gradient(120% 120% at 50% 110%, #ffe5f3 0%, transparent 55%), #ffffff; border:1.5px solid rgba(255,255,255,.95); box-shadow:0 32px 64px -34px rgba(220,110,200,.55), 0 8px 20px -14px rgba(150,110,200,.4), inset 0 1px 0 rgba(255,255,255,.95); transform-style:preserve-3d; transition:box-shadow .35s, transform .55s cubic-bezier(.34,1.56,.64,1); isolation:isolate; cursor:pointer;">
+        <div data-bento-glow aria-hidden="true" style="position:absolute; inset:0; background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.85), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .35s; pointer-events:none; mix-blend-mode:soft-light;"></div>
+        <div style="position:relative; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <div data-bento-icon style="display:grid; place-items:center; width:86px; height:86px; border-radius:26px; background:linear-gradient(135deg,#ff8ec4,#c08bff); border:2px solid #fff; box-shadow:0 18px 32px -10px rgba(192,130,255,.65), inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 rgba(0,0,0,.04); font-size:46px; transform:translateZ(52px); transition:transform .45s cubic-bezier(.34,1.56,.64,1);">🎨</div>
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:30px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:11.5px; letter-spacing:.6px; color:#fff; background:linear-gradient(135deg,#ff7eb8,#c08bff); box-shadow:0 8px 18px -8px rgba(255,110,170,.7); transform:translateZ(34px);">⭐ FEATURED</span>
+        </div>
+        <h3 style="position:relative; font-family:'Fredoka',sans-serif; font-weight:600; font-size:clamp(22px,2.6vw,28px); margin:18px 0 8px; color:var(--ink); transform:translateZ(22px); line-height:1.15;">Painting &amp; Drawing</h3>
+        <p style="position:relative; margin:0; color:var(--ink); opacity:.74; font-weight:600; font-size:15px; line-height:1.6; max-width:46ch; transform:translateZ(14px);">Colorful canvases where imagination runs wild — finger paints, watercolours and bright crayons every single day.</p>
+        <span aria-hidden="true" style="position:absolute; bottom:-30px; right:-24px; font-size:160px; opacity:.09; pointer-events:none;">🖌️</span>
+        <span aria-hidden="true" style="position:absolute; top:18%; right:8%; font-size:24px; color:#ffd45e; animation:twinkle 3.2s ease-in-out infinite;">✦</span>
+      </div>
+
+      <!-- 3. Storytime & Reading -->
+      <div data-bento-card role="listitem" tabindex="0" style="grid-column:span 1; position:relative; overflow:hidden; border-radius:30px; padding:clamp(24px,2.6vw,30px); min-height:240px; background:radial-gradient(120% 100% at 0% 0%, #d6efff 0%, transparent 55%), radial-gradient(100% 90% at 100% 20%, #d1f3e2 0%, transparent 60%), radial-gradient(120% 120% at 50% 110%, #e3f6ff 0%, transparent 55%), #ffffff; border:1.5px solid rgba(255,255,255,.95); box-shadow:0 30px 60px -34px rgba(110,170,255,.55), 0 8px 20px -14px rgba(150,110,200,.4), inset 0 1px 0 rgba(255,255,255,.95); transform-style:preserve-3d; transition:box-shadow .35s, transform .55s cubic-bezier(.34,1.56,.64,1); isolation:isolate; cursor:pointer;">
+        <div data-bento-glow aria-hidden="true" style="position:absolute; inset:0; background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.85), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .35s; pointer-events:none; mix-blend-mode:soft-light;"></div>
+        <div data-bento-icon style="position:relative; display:grid; place-items:center; width:78px; height:78px; border-radius:24px; background:linear-gradient(135deg,#9fd6f5,#9fe7c9); border:2px solid #fff; box-shadow:0 16px 28px -10px rgba(110,170,230,.55), inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 rgba(0,0,0,.04); font-size:40px; transform:translateZ(40px); transition:transform .45s cubic-bezier(.34,1.56,.64,1);">📖</div>
+        <h3 style="position:relative; font-family:'Fredoka',sans-serif; font-weight:600; font-size:22px; margin:20px 0 8px; color:var(--ink); transform:translateZ(22px);">Storytime &amp; Reading</h3>
+        <p style="position:relative; margin:0; color:var(--ink); opacity:.74; font-weight:600; font-size:14.5px; line-height:1.6; max-width:30ch; transform:translateZ(14px);">Magical stories that grow language, listening and a love of books.</p>
+        <span aria-hidden="true" style="position:absolute; bottom:-30px; right:-22px; font-size:150px; opacity:.08; pointer-events:none;">📚</span>
+      </div>
+
+      <!-- 4. Music & Movement (WIDE) -->
+      <div data-bento-card data-bento-wide role="listitem" tabindex="0" style="grid-column:span 2; position:relative; overflow:hidden; border-radius:30px; padding:clamp(24px,2.6vw,32px); min-height:240px; background:radial-gradient(110% 100% at 8% 10%, #ffefc2 0%, transparent 55%), radial-gradient(90% 90% at 96% 14%, #ffd1b8 0%, transparent 60%), radial-gradient(120% 120% at 50% 110%, #fff6dd 0%, transparent 55%), #ffffff; border:1.5px solid rgba(255,255,255,.95); box-shadow:0 32px 64px -34px rgba(245,170,90,.55), 0 8px 20px -14px rgba(150,110,200,.4), inset 0 1px 0 rgba(255,255,255,.95); transform-style:preserve-3d; transition:box-shadow .35s, transform .55s cubic-bezier(.34,1.56,.64,1); isolation:isolate; cursor:pointer;">
+        <div data-bento-glow aria-hidden="true" style="position:absolute; inset:0; background:radial-gradient(280px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.85), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .35s; pointer-events:none; mix-blend-mode:soft-light;"></div>
+        <div style="position:relative; display:flex; align-items:center; gap:16px; flex-wrap:wrap;">
+          <div data-bento-icon style="display:grid; place-items:center; width:86px; height:86px; border-radius:26px; background:linear-gradient(135deg,#ffd45e,#ff9a73); border:2px solid #fff; box-shadow:0 18px 32px -10px rgba(255,170,80,.65), inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 rgba(0,0,0,.04); font-size:46px; transform:translateZ(52px); transition:transform .45s cubic-bezier(.34,1.56,.64,1);">🎵</div>
+          <span style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:30px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:11.5px; letter-spacing:.6px; color:#fff; background:linear-gradient(135deg,#ff9a73,#ffd45e); box-shadow:0 8px 18px -8px rgba(255,170,80,.7); transform:translateZ(34px);">💃 ACTIVE</span>
+        </div>
+        <h3 style="position:relative; font-family:'Fredoka',sans-serif; font-weight:600; font-size:clamp(22px,2.6vw,28px); margin:18px 0 8px; color:var(--ink); transform:translateZ(22px); line-height:1.15;">Music &amp; Movement</h3>
+        <p style="position:relative; margin:0; color:var(--ink); opacity:.74; font-weight:600; font-size:15px; line-height:1.6; max-width:46ch; transform:translateZ(14px);">Songs, dance and rhythm that get little bodies moving — clap, twirl, jump, repeat!</p>
+        <span aria-hidden="true" style="position:absolute; bottom:-26px; right:-22px; font-size:160px; opacity:.09; pointer-events:none;">🎶</span>
+        <span aria-hidden="true" style="position:absolute; top:24%; right:10%; font-size:24px; color:#ff86b6; animation:bob 4s ease-in-out infinite;">♪</span>
+      </div>
+
+      <!-- 5. Toy Play -->
+      <div data-bento-card role="listitem" tabindex="0" style="grid-column:span 1; position:relative; overflow:hidden; border-radius:30px; padding:clamp(24px,2.6vw,30px); min-height:240px; background:radial-gradient(120% 100% at 0% 0%, #e2d5ff 0%, transparent 55%), radial-gradient(100% 90% at 100% 20%, #ffd2e8 0%, transparent 60%), radial-gradient(120% 120% at 50% 110%, #ece2ff 0%, transparent 55%), #ffffff; border:1.5px solid rgba(255,255,255,.95); box-shadow:0 30px 60px -34px rgba(170,130,240,.55), 0 8px 20px -14px rgba(150,110,200,.4), inset 0 1px 0 rgba(255,255,255,.95); transform-style:preserve-3d; transition:box-shadow .35s, transform .55s cubic-bezier(.34,1.56,.64,1); isolation:isolate; cursor:pointer;">
+        <div data-bento-glow aria-hidden="true" style="position:absolute; inset:0; background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.85), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .35s; pointer-events:none; mix-blend-mode:soft-light;"></div>
+        <div data-bento-icon style="position:relative; display:grid; place-items:center; width:78px; height:78px; border-radius:24px; background:linear-gradient(135deg,#c5b3ff,#ff86b6); border:2px solid #fff; box-shadow:0 16px 28px -10px rgba(170,130,240,.55), inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 rgba(0,0,0,.04); font-size:40px; transform:translateZ(40px); transition:transform .45s cubic-bezier(.34,1.56,.64,1);">🧸</div>
+        <h3 style="position:relative; font-family:'Fredoka',sans-serif; font-weight:600; font-size:22px; margin:20px 0 8px; color:var(--ink); transform:translateZ(22px);">Toy Play</h3>
+        <p style="position:relative; margin:0; color:var(--ink); opacity:.74; font-weight:600; font-size:14.5px; line-height:1.6; max-width:30ch; transform:translateZ(14px);">Hands-on toys, blocks and dolls that spark creative, joyful discovery.</p>
+        <span aria-hidden="true" style="position:absolute; bottom:-30px; right:-22px; font-size:150px; opacity:.08; pointer-events:none;">🧸</span>
+      </div>
+
+      <!-- 6. Friendly Group Play -->
+      <div data-bento-card role="listitem" tabindex="0" style="grid-column:span 1; position:relative; overflow:hidden; border-radius:30px; padding:clamp(24px,2.6vw,30px); min-height:240px; background:radial-gradient(120% 100% at 0% 0%, #cdf2dc 0%, transparent 55%), radial-gradient(100% 90% at 100% 20%, #d4e6ff 0%, transparent 60%), radial-gradient(120% 120% at 50% 110%, #e0f6ec 0%, transparent 55%), #ffffff; border:1.5px solid rgba(255,255,255,.95); box-shadow:0 30px 60px -34px rgba(110,200,160,.55), 0 8px 20px -14px rgba(150,110,200,.4), inset 0 1px 0 rgba(255,255,255,.95); transform-style:preserve-3d; transition:box-shadow .35s, transform .55s cubic-bezier(.34,1.56,.64,1); isolation:isolate; cursor:pointer;">
+        <div data-bento-glow aria-hidden="true" style="position:absolute; inset:0; background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.85), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .35s; pointer-events:none; mix-blend-mode:soft-light;"></div>
+        <div data-bento-icon style="position:relative; display:grid; place-items:center; width:78px; height:78px; border-radius:24px; background:linear-gradient(135deg,#9fe7c9,#b9a7f3); border:2px solid #fff; box-shadow:0 16px 28px -10px rgba(110,200,160,.55), inset 0 2px 0 rgba(255,255,255,.7), 0 2px 0 rgba(0,0,0,.04); font-size:40px; transform:translateZ(40px); transition:transform .45s cubic-bezier(.34,1.56,.64,1);">👫</div>
+        <h3 style="position:relative; font-family:'Fredoka',sans-serif; font-weight:600; font-size:22px; margin:20px 0 8px; color:var(--ink); transform:translateZ(22px);">Friendly Group Play</h3>
+        <p style="position:relative; margin:0; color:var(--ink); opacity:.74; font-weight:600; font-size:14.5px; line-height:1.6; max-width:30ch; transform:translateZ(14px);">Sharing and teamwork that build kind little friendships for life.</p>
+        <span aria-hidden="true" style="position:absolute; bottom:-30px; right:-22px; font-size:150px; opacity:.08; pointer-events:none;">🫶</span>
+      </div>
+
+      <!-- 7. Daily care tile (decorative filler) -->
+      <!-- <div data-bento-card style="grid-column:span 1; position:relative; overflow:hidden; border-radius:30px; padding:clamp(24px,2.6vw,30px); min-height:240px; background:linear-gradient(135deg,#ff9ecb 0%,#c08bff 55%,#6fb8ff 100%); border:1.5px solid rgba(255,255,255,.6); box-shadow:0 30px 60px -28px rgba(180,110,220,.7), 0 8px 20px -14px rgba(150,110,200,.4), inset 0 1px 0 rgba(255,255,255,.5); transform-style:preserve-3d; transition:box-shadow .35s, transform .55s cubic-bezier(.34,1.56,.64,1); isolation:isolate; cursor:pointer; color:#fff;">
+        <div data-bento-glow aria-hidden="true" style="position:absolute; inset:0; background:radial-gradient(220px circle at var(--mx,50%) var(--my,50%), rgba(255,255,255,.45), rgba(255,255,255,0) 70%); opacity:0; transition:opacity .35s; pointer-events:none;"></div>
+        <div data-bento-icon style="position:relative; display:grid; place-items:center; width:78px; height:78px; border-radius:24px; background:rgba(255,255,255,.22); border:2px solid rgba(255,255,255,.45); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); box-shadow:inset 0 2px 0 rgba(255,255,255,.4); font-size:40px; transform:translateZ(40px); transition:transform .45s cubic-bezier(.34,1.56,.64,1);">✨</div>
+        <h3 style="position:relative; font-family:'Fredoka',sans-serif; font-weight:600; font-size:22px; margin:20px 0 8px; color:#fff; transform:translateZ(22px); text-shadow:0 2px 10px rgba(140,80,180,.35);">Tiny moments,<br>big growth</h3>
+        <p style="position:relative; margin:0; color:#fff; opacity:.92; font-weight:600; font-size:14.5px; line-height:1.6; max-width:28ch; transform:translateZ(14px);">Plus daily snacks, naps and gentle care that keep every little one thriving.</p>
+        <span aria-hidden="true" style="position:absolute; bottom:-22px; right:-18px; font-size:140px; opacity:.18; pointer-events:none;">🌈</span>
+      </div> -->
+
+    </div>
+  </section>
+
+  <!-- ====== PLAY & LEARN MEMORY GAME ====== -->
+  <section id="play" aria-labelledby="game-title" style="position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:clamp(50px,7vw,90px) clamp(18px,4vw,46px);scroll-margin-top:90px;">
+    <div data-reveal style="text-align:center;margin-bottom:clamp(24px,3.5vw,38px);">
+      <span style="display:inline-flex;align-items:center;gap:8px;font-family:'Fredoka',sans-serif;font-weight:600;color:var(--pink-d);letter-spacing:1.5px;font-size:13px;padding:8px 17px;border-radius:30px;background:rgba(255,255,255,.72);border:1.5px solid #fff;box-shadow:0 8px 22px -12px rgba(255,126,184,.55);">🌈 PLAY &amp; LEARN</span>
+      <h2 id="game-title" style="font-family:'Fredoka',sans-serif;font-weight:700;font-size:clamp(34px,5.5vw,58px);margin:13px 0 0;color:var(--ink);letter-spacing:-.6px;">Rainbow <span style="background:linear-gradient(120deg,#ff7eb8,#9b78ee 52%,#58cfa1);-webkit-background-clip:text;background-clip:text;color:transparent;">Play Garden</span></h2>
+      <p style="margin:10px auto 0;color:var(--ink-soft);font-weight:600;font-size:clamp(15px,2vw,17px);max-width:620px;line-height:1.6;">Choose a little learning adventure. Take your time—every try helps your clever mind grow!</p>
+    </div>
+
+    <div data-reveal role="tablist" aria-label="Choose a game" style="display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:-8px 0 20px;">
+      <button type="button" class="game-picker" role="tab" data-game-picker="memory" aria-selected="true" aria-controls="memory-game">🧠 Memory Match</button>
+      <button type="button" class="game-picker" role="tab" data-game-picker="pattern" aria-selected="false" aria-controls="pattern-game">🔮 What Comes Next?</button>
+      <button type="button" class="game-picker" role="tab" data-game-picker="feed" aria-selected="false" aria-controls="feed-game">🍎 Feed a Friend</button>
+      <button type="button" class="game-picker" role="tab" data-game-picker="balloon" aria-selected="false" aria-controls="balloon-game">🎈 Colour Balloon Pop</button>
+    </div>
+
+    <div id="memory-game" data-game-panel="memory" data-game-shell data-reveal role="tabpanel" style="position:relative;overflow:hidden;border-radius:clamp(28px,4vw,42px);padding:clamp(20px,4vw,46px);background:radial-gradient(700px 320px at 0% 0%,rgba(255,190,222,.55),transparent 68%),radial-gradient(680px 340px at 100% 100%,rgba(159,231,201,.58),transparent 68%),linear-gradient(145deg,rgba(255,255,255,.96),rgba(244,239,255,.93));border:2px solid rgba(255,255,255,.95);box-shadow:0 36px 72px -34px rgba(120,90,200,.55),inset 0 1px 0 #fff;">
+      <div aria-hidden="true" style="position:absolute;top:7%;left:4%;font-size:clamp(34px,5vw,58px);opacity:.22;animation:floatYs 5s ease-in-out infinite;">🦋</div>
+      <div aria-hidden="true" style="position:absolute;top:5%;right:5%;font-size:clamp(32px,5vw,54px);opacity:.2;animation:gameCloud 7s ease-in-out infinite;">☁️</div>
+      <div aria-hidden="true" style="position:absolute;bottom:3%;left:3%;font-size:clamp(34px,5vw,56px);opacity:.2;animation:bob 5.5s ease-in-out infinite;">🌻</div>
+      <div aria-hidden="true" style="position:absolute;bottom:3%;right:3%;font-size:clamp(34px,5vw,56px);opacity:.2;animation:floatYs 6s ease-in-out .5s infinite;">🚀</div>
+
+      <div style="position:relative;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin:0 auto clamp(18px,3vw,28px);max-width:650px;">
+        <div role="group" aria-label="Choose game level" style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="game-level" data-game-level="3" aria-pressed="false">Easy · 3</button>
+          <button type="button" class="game-level" data-game-level="4" aria-pressed="true">Happy · 4</button>
+          <button type="button" class="game-level" data-game-level="6" aria-pressed="false">Super · 6</button>
+        </div>
+        <button type="button" data-game-restart style="border:0;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-family:'Fredoka',sans-serif;font-weight:600;color:#fff;padding:10px 17px;border-radius:15px;background:linear-gradient(135deg,#59d5a7,#3ebc8d);box-shadow:0 10px 20px -10px rgba(62,188,141,.8);">↻ New Game</button>
+      </div>
+
+      <div data-game-board class="memory-grid" data-pairs="4" role="grid" aria-label="Memory matching cards"></div>
+
+      <div style="position:relative;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:clamp(18px,3vw,28px);text-align:center;">
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:30px;background:rgba(255,255,255,.82);box-shadow:0 8px 18px -12px rgba(120,90,200,.45);font-weight:800;color:var(--ink);">⭐ Matches: <span data-game-matches>0 / 4</span></span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:9px 15px;border-radius:30px;background:rgba(255,255,255,.82);box-shadow:0 8px 18px -12px rgba(120,90,200,.45);font-weight:800;color:var(--ink);">✨ Turns: <span data-game-turns>0</span></span>
+      </div>
+      <p data-game-status role="status" aria-live="polite" style="position:relative;min-height:30px;margin:14px 0 0;text-align:center;font-family:'Fredoka',sans-serif;font-weight:600;font-size:clamp(16px,2.2vw,19px);color:var(--lav-d);">Choose two cards to begin!</p>
+      <div data-game-celebration aria-hidden="true" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;"></div>
+    </div>
+
+    <div id="pattern-game" data-game-panel="pattern" hidden role="tabpanel" style="position:relative;overflow:hidden;border-radius:clamp(28px,4vw,42px);padding:clamp(22px,4vw,46px);background:radial-gradient(700px 330px at 0% 100%,rgba(159,214,245,.58),transparent 68%),radial-gradient(680px 340px at 100% 0%,rgba(255,227,154,.62),transparent 68%),linear-gradient(145deg,rgba(255,255,255,.97),rgba(238,251,246,.94));border:2px solid rgba(255,255,255,.95);box-shadow:0 36px 72px -34px rgba(80,170,180,.5),inset 0 1px 0 #fff;">
+      <div aria-hidden="true" style="position:absolute;top:4%;left:4%;font-size:clamp(32px,5vw,54px);opacity:.2;animation:bob 5s ease-in-out infinite;">🦖</div>
+      <div aria-hidden="true" style="position:absolute;top:4%;right:4%;font-size:clamp(32px,5vw,54px);opacity:.2;animation:floatYs 6s ease-in-out infinite;">🎈</div>
+      <div style="position:relative;text-align:center;">
+        <span data-pattern-round style="display:inline-flex;padding:8px 15px;border-radius:30px;background:rgba(255,255,255,.82);font-weight:800;color:var(--ink);box-shadow:0 8px 18px -12px rgba(74,63,107,.4);">Round 1 of 5</span>
+        <h3 style="font-family:'Fredoka',sans-serif;font-size:clamp(24px,4vw,34px);margin:15px 0 4px;color:var(--ink);">What comes next?</h3>
+        <p style="margin:0;color:var(--ink-soft);font-weight:700;">Look at the pattern, then choose the missing picture.</p>
+      </div>
+      <div data-pattern-sequence class="pattern-sequence" aria-label="Picture pattern"></div>
+      <div data-pattern-choices class="pattern-choices" role="group" aria-label="Choose the next picture"></div>
+      <p data-pattern-status role="status" aria-live="polite" style="position:relative;min-height:30px;margin:18px 0 0;text-align:center;font-family:'Fredoka',sans-serif;font-weight:600;font-size:clamp(16px,2.2vw,19px);color:#318f72;">Tap the picture that comes next!</p>
+      <div style="position:relative;display:flex;justify-content:center;margin-top:8px;">
+        <button type="button" data-pattern-next hidden style="border:0;cursor:pointer;font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px;color:#fff;padding:12px 24px;border-radius:17px;background:linear-gradient(135deg,#59d5a7,#6fa8f5);box-shadow:0 13px 24px -12px rgba(60,160,170,.8);">Next Round →</button>
+      </div>
+      <div data-pattern-celebration aria-hidden="true" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;"></div>
+    </div>
+
+    <div id="feed-game" data-game-panel="feed" hidden role="tabpanel" style="position:relative;overflow:hidden;border-radius:clamp(28px,4vw,42px);padding:clamp(22px,4vw,46px);background:radial-gradient(700px 340px at 0% 0%,rgba(255,201,168,.56),transparent 68%),radial-gradient(680px 350px at 100% 100%,rgba(159,231,201,.62),transparent 68%),linear-gradient(145deg,rgba(255,255,255,.97),rgba(255,249,230,.94));border:2px solid rgba(255,255,255,.95);box-shadow:0 36px 72px -34px rgba(190,140,80,.44),inset 0 1px 0 #fff;">
+      <div aria-hidden="true" style="position:absolute;top:5%;left:4%;font-size:clamp(32px,5vw,54px);opacity:.2;animation:bob 5s ease-in-out infinite;">🍃</div>
+      <div aria-hidden="true" style="position:absolute;top:5%;right:4%;font-size:clamp(32px,5vw,54px);opacity:.2;animation:floatYs 6s ease-in-out infinite;">☀️</div>
+      <div style="position:relative;text-align:center;">
+        <span data-feed-round style="display:inline-flex;padding:8px 15px;border-radius:30px;background:rgba(255,255,255,.84);font-weight:800;color:var(--ink);box-shadow:0 8px 18px -12px rgba(74,63,107,.4);">Friend 1 of 5</span>
+        <h3 data-feed-title style="font-family:'Fredoka',sans-serif;font-size:clamp(24px,4vw,34px);margin:15px 0 3px;color:var(--ink);">What does Bunny love to eat?</h3>
+        <p style="margin:0;color:var(--ink-soft);font-weight:700;">Choose the tasty food for our hungry friend.</p>
+      </div>
+      <div data-feed-friend class="feed-friend" aria-label="Hungry animal">🐰</div>
+      <div data-food-choices class="food-choices" role="group" aria-label="Choose food for the animal"></div>
+      <p data-feed-status role="status" aria-live="polite" style="position:relative;min-height:30px;margin:18px 0 0;text-align:center;font-family:'Fredoka',sans-serif;font-weight:600;font-size:clamp(16px,2.2vw,19px);color:#318f72;">Tap the food Bunny likes!</p>
+      <div style="position:relative;display:flex;justify-content:center;margin-top:8px;">
+        <button type="button" data-feed-next hidden style="border:0;cursor:pointer;font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px;color:#fff;padding:12px 24px;border-radius:17px;background:var(--lav-d);box-shadow:0 13px 24px -12px rgba(139,110,232,.8);">Next Friend →</button>
+      </div>
+      <div data-feed-celebration aria-hidden="true" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;"></div>
+    </div>
+
+    <div id="balloon-game" data-game-panel="balloon" hidden role="tabpanel" style="position:relative;overflow:hidden;border-radius:clamp(28px,4vw,42px);padding:clamp(22px,4vw,46px);background:radial-gradient(700px 340px at 0% 100%,rgba(159,214,245,.62),transparent 68%),radial-gradient(680px 350px at 100% 0%,rgba(255,174,212,.52),transparent 68%),linear-gradient(145deg,rgba(255,255,255,.97),rgba(242,248,255,.95));border:2px solid rgba(255,255,255,.95);box-shadow:0 36px 72px -34px rgba(90,150,210,.5),inset 0 1px 0 #fff;">
+      <div aria-hidden="true" style="position:absolute;top:5%;left:4%;font-size:clamp(30px,5vw,50px);opacity:.2;animation:floatYs 6s ease-in-out infinite;">☁️</div>
+      <div aria-hidden="true" style="position:absolute;top:5%;right:4%;font-size:clamp(30px,5vw,50px);opacity:.2;animation:twinkle 4s ease-in-out infinite;">🌟</div>
+      <div style="position:relative;text-align:center;">
+        <span data-balloon-round style="display:inline-flex;padding:8px 15px;border-radius:30px;background:rgba(255,255,255,.84);font-weight:800;color:var(--ink);box-shadow:0 8px 18px -12px rgba(74,63,107,.4);">Round 1 of 5</span>
+        <h3 style="font-family:'Fredoka',sans-serif;font-size:clamp(24px,4vw,34px);margin:15px 0 3px;color:var(--ink);">Pop the <span data-balloon-colour style="color:var(--lav-d);">purple</span> balloons!</h3>
+        <p style="margin:0;color:var(--ink-soft);font-weight:700;">Look carefully and tap every balloon of the matching colour.</p>
+      </div>
+      <div data-balloon-field class="balloon-field" role="group" aria-label="Colourful balloons"></div>
+      <p data-balloon-status role="status" aria-live="polite" style="position:relative;min-height:30px;margin:8px 0 0;text-align:center;font-family:'Fredoka',sans-serif;font-weight:600;font-size:clamp(16px,2.2vw,19px);color:#4779b8;">Find all the matching balloons!</p>
+      <div style="position:relative;display:flex;justify-content:center;margin-top:8px;">
+        <button type="button" data-balloon-next hidden style="border:0;cursor:pointer;font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px;color:#fff;padding:12px 24px;border-radius:17px;background:var(--lav-d);box-shadow:0 13px 24px -12px rgba(139,110,232,.8);">Next Colour →</button>
+      </div>
+      <div data-balloon-celebration aria-hidden="true" style="position:absolute;inset:0;overflow:hidden;pointer-events:none;"></div>
+    </div>
+
+    <p style="margin:14px auto 0;text-align:center;color:var(--ink-soft);font-size:12px;font-weight:700;">Parent-friendly promise: no ads, no sign-in, no data collection and no automatic sounds.</p>
+  </section>
+
+  <!-- ====== GALLERY ====== -->
+  <section id="gallery" style="position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:clamp(40px,6vw,72px) clamp(18px,4vw,46px);">
+    <div data-reveal style="text-align:center; margin-bottom:clamp(28px,4vw,46px);">
+      <span style="font-family:'Fredoka',sans-serif; font-weight:600; color:var(--mint); letter-spacing:1px; filter:saturate(1.4) brightness(.85);">📸 A PEEK INSIDE</span>
+      <h2 style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(30px,5vw,52px); margin:8px 0 0; color:var(--ink);">Moments of <span style="color:var(--lav-d);">pure joy</span></h2>
+      <p style="margin:10px 0 0;color:var(--ink-soft);font-weight:600;">A little window into colourful days of learning, friendship and play.</p>
+    </div>
+    <div data-gallery-wrap>
+      <button type="button" class="gallery-arrow" data-gallery-prev aria-label="Show previous gallery image">‹</button>
+      <div data-gallery-track aria-label="Day care moments gallery" tabindex="0" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:clamp(14px,2.2vw,22px);">
+      <div data-reveal data-gallery-card style="position:relative; height:300px; border-radius:28px; overflow:hidden; box-shadow:0 26px 50px -26px rgba(150,110,200,.55); cursor:pointer;" style-hover="transform:translateY(-6px)">
+        <div style="position:absolute; inset:0; background:linear-gradient(150deg,#ffb3d9,#ff8ec4 45%,#c08bff);"></div>
+        <img src="https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=800&q=70" alt="A joyful child with colourful paint on their face during creative play" loading="lazy" onError="{{ imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .5s;" style-hover="transform:scale(1.12)">
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(38,26,66,.5), rgba(38,26,66,0) 52%);"></div>
+        <div style="position:absolute; left:14px; bottom:14px; padding:10px 16px; border-radius:16px; background:rgba(255,255,255,.85); backdrop-filter:blur(8px); font-family:'Fredoka',sans-serif; font-weight:600; color:var(--ink);">Creative Play</div>
+      </div>
+      <div data-reveal data-gallery-card style="position:relative; height:300px; border-radius:28px; overflow:hidden; box-shadow:0 26px 50px -26px rgba(150,110,200,.55); cursor:pointer;" style-hover="transform:translateY(-6px)">
+        <div style="position:absolute; inset:0; background:linear-gradient(150deg,#9fd6f5,#7fb8f0 45%,#a8e6cf);"></div>
+        <img src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=800&q=70" alt="A young child exploring and learning in a bright, cosy classroom" loading="lazy" onError="{{ imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .5s;" style-hover="transform:scale(1.12)">
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(38,26,66,.5), rgba(38,26,66,0) 52%);"></div>
+        <div style="position:absolute; left:14px; bottom:14px; padding:10px 16px; border-radius:16px; background:rgba(255,255,255,.85); backdrop-filter:blur(8px); font-family:'Fredoka',sans-serif; font-weight:600; color:var(--ink);">Soft Learning</div>
+      </div>
+      <div data-reveal data-gallery-card style="position:relative; height:300px; border-radius:28px; overflow:hidden; box-shadow:0 26px 50px -26px rgba(150,110,200,.55); cursor:pointer;" style-hover="transform:translateY(-6px)">
+        <div style="position:absolute; inset:0; background:linear-gradient(150deg,#ffd59a,#ffc178 45%,#ffb3d9);"></div>
+        <img src="https://images.unsplash.com/photo-1543248939-4296e1fea89b?auto=format&fit=crop&w=800&q=70" alt="A warm reading nook lined with books for storytime" loading="lazy" onError="{{ imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .5s;" style-hover="transform:scale(1.12)">
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(38,26,66,.5), rgba(38,26,66,0) 52%);"></div>
+        <div style="position:absolute; left:14px; bottom:14px; padding:10px 16px; border-radius:16px; background:rgba(255,255,255,.85); backdrop-filter:blur(8px); font-family:'Fredoka',sans-serif; font-weight:600; color:var(--ink);">Storytime</div>
+      </div>
+      <div data-reveal data-gallery-card style="position:relative; height:300px; border-radius:28px; overflow:hidden; box-shadow:0 26px 50px -26px rgba(150,110,200,.55); cursor:pointer;" style-hover="transform:translateY(-6px)">
+        <div style="position:absolute; inset:0; background:linear-gradient(150deg,#c5b3ff,#a88bf0 45%,#9fd6f5);"></div>
+        <img src="https://images.unsplash.com/photo-1607453998774-d533f65dac99?auto=format&fit=crop&w=800&q=70" alt="Three happy children laughing together in a playful group" loading="lazy" onError="{{ imgError }}" style="position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .5s;" style-hover="transform:scale(1.12)">
+        <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(38,26,66,.5), rgba(38,26,66,0) 52%);"></div>
+        <div style="position:absolute; left:14px; bottom:14px; padding:10px 16px; border-radius:16px; background:rgba(255,255,255,.85); backdrop-filter:blur(8px); font-family:'Fredoka',sans-serif; font-weight:600; color:var(--ink);">Happy Playroom</div>
+      </div>
+      <div data-reveal data-gallery-card style="position:relative;height:300px;border-radius:28px;overflow:hidden;cursor:pointer;">
+        <div style="position:absolute;inset:0;background:linear-gradient(150deg,#9fe7c9,#6dcfa7 48%,#9fd6f5);"></div>
+        <img src="assets/playroom-wide.png" alt="A bright playroom prepared for imaginative indoor play" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s;" style-hover="transform:scale(1.12)">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(38,26,66,.5),rgba(38,26,66,0) 52%);"></div>
+        <div style="position:absolute;left:14px;bottom:14px;padding:10px 16px;border-radius:16px;background:rgba(255,255,255,.87);backdrop-filter:blur(8px);font-family:'Fredoka',sans-serif;font-weight:600;color:var(--ink);">Imaginative Play</div>
+      </div>
+      <div data-reveal data-gallery-card style="position:relative;height:300px;border-radius:28px;overflow:hidden;cursor:pointer;">
+        <div style="position:absolute;inset:0;background:linear-gradient(150deg,#c5b3ff,#82b9f4 48%,#9fe7c9);"></div>
+        <img src="https://images.unsplash.com/photo-1542810634-71277d95dcbb?auto=format&fit=crop&w=800&q=72" alt="Children enjoying a cheerful outdoor group activity" loading="lazy" onError="{{ imgError }}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .5s;" style-hover="transform:scale(1.12)">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(38,26,66,.5),rgba(38,26,66,0) 52%);"></div>
+        <div style="position:absolute;left:14px;bottom:14px;padding:10px 16px;border-radius:16px;background:rgba(255,255,255,.87);backdrop-filter:blur(8px);font-family:'Fredoka',sans-serif;font-weight:600;color:var(--ink);">Outdoor Adventure</div>
+      </div>
+      </div>
+      <button type="button" class="gallery-arrow" data-gallery-next aria-label="Show next gallery image">›</button>
+      <div data-gallery-dots aria-label="Choose a gallery image"></div>
+    </div>
+    <span data-gallery-status aria-live="polite" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Image 1 of 6</span>
+  </section>
+
+  <!-- ====== CONTACT ====== -->
+  <section id="contact" style="position:relative; z-index:2; max-width:1200px; margin:0 auto; padding:clamp(40px,6vw,72px) clamp(18px,4vw,46px);">
+    <div data-reveal style="position:relative; overflow:hidden; border-radius:36px; padding:clamp(28px,4vw,52px); background:linear-gradient(135deg,#fff 0%, #fbf3ff 100%); border:1px solid rgba(255,255,255,.9); box-shadow:0 34px 66px -30px rgba(150,110,200,.55);">
+      <div aria-hidden="true" style="position:absolute; top:-40px; right:-30px; width:170px; height:170px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffd9ec, rgba(255,179,217,.2)); animation:floatY 7s ease-in-out infinite;"></div>
+      <div style="position:relative; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:clamp(24px,4vw,46px); align-items:center;">
+        <div>
+          <span style="font-family:'Fredoka',sans-serif; font-weight:600; color:var(--pink-d); letter-spacing:1px;">📍 GET IN TOUCH</span>
+          <h2 style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(30px,5vw,48px); margin:8px 0 22px; color:var(--ink);">Contact Us Today</h2>
+
+          <a href="https://maps.google.com/?q=106 Green Road Trincomalee" target="_blank" rel="noopener" style="display:flex; align-items:center; gap:16px; text-decoration:none; color:inherit; padding:14px; border-radius:18px; background:rgba(255,255,255,.7); margin-bottom:12px; transition:.2s;" style-hover="transform:translateX(4px)">
+            <span style="flex:none; width:50px; height:50px; border-radius:15px; display:grid; place-items:center; font-size:24px; background:linear-gradient(135deg,#ffd9ec,#ffb3d9);">📍</span>
+            <span><strong style="font-family:'Fredoka',sans-serif; display:block; font-size:13px; color:var(--ink-soft);">Address</strong><span style="font-weight:700;">106, Green Road, Trincomalee</span></span>
+          </a>
+          <a href="{{ telHref }}" style="display:flex; align-items:center; gap:16px; text-decoration:none; color:inherit; padding:14px; border-radius:18px; background:rgba(255,255,255,.7); margin-bottom:12px; transition:.2s;" style-hover="transform:translateX(4px)">
+            <span style="flex:none; width:50px; height:50px; border-radius:15px; display:grid; place-items:center; font-size:24px; background:linear-gradient(135deg,#e0d4ff,#b9a7f3);">📞</span>
+            <span><strong style="font-family:'Fredoka',sans-serif; display:block; font-size:13px; color:var(--ink-soft);">Call us</strong><span style="font-weight:700;">071 036 5378</span></span>
+          </a>
+          <a href="{{ waHref }}" target="_blank" rel="noopener" style="display:flex; align-items:center; gap:16px; text-decoration:none; color:inherit; padding:14px; border-radius:18px; background:rgba(255,255,255,.7); transition:.2s;" style-hover="transform:translateX(4px)">
+            <span style="flex:none; width:50px; height:50px; border-radius:15px; display:grid; place-items:center; font-size:24px; background:linear-gradient(135deg,#c9f3e3,#9fe7c9);">💬</span>
+            <span><strong style="font-family:'Fredoka',sans-serif; display:block; font-size:13px; color:var(--ink-soft);">WhatsApp</strong><span style="font-weight:700;">071 697 3676</span></span>
+          </a>
+
+          <a href="{{ waHref }}" target="_blank" rel="noopener" style="position:relative; overflow:hidden; margin-top:24px; text-decoration:none; display:inline-flex; align-items:center; gap:10px; font-family:'Fredoka',sans-serif; font-weight:600; font-size:18px; color:#fff; padding:16px 32px; border-radius:20px; background:linear-gradient(135deg,var(--pink-d),#b07bff); box-shadow:0 18px 36px -14px rgba(180,110,200,.85);" style-hover="transform:translateY(-3px)">
+            ✨ Contact Us Today
+            <span aria-hidden="true" style="position:absolute; top:0; left:0; width:38%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent); animation:shine 3.4s ease-in-out infinite;"></span>
+          </a>
+        </div>
+
+        <div style="position:relative; height:clamp(240px,34vw,340px); border-radius:28px; overflow:hidden; box-shadow:0 24px 46px -24px rgba(150,110,200,.5); background:
+          linear-gradient(135deg,#dff3ff,#eef9f1);">
+          <div style="position:absolute; inset:0; background-image:
+            linear-gradient(rgba(159,214,245,.35) 1.5px, transparent 1.5px),
+            linear-gradient(90deg, rgba(159,214,245,.35) 1.5px, transparent 1.5px);
+            background-size:38px 38px;"></div>
+          <div style="position:absolute; top:30%; left:18%; width:55%; height:14px; border-radius:10px; background:#ffd59a; transform:rotate(-8deg);"></div>
+          <div style="position:absolute; top:62%; left:8%; width:70%; height:14px; border-radius:10px; background:#9fe7c9; transform:rotate(6deg);"></div>
+          <div style="position:absolute; top:45%; left:46%; transform:translate(-50%,-100%); display:flex; flex-direction:column; align-items:center;">
+            <span style="width:46px; height:46px; border-radius:50% 50% 50% 0; transform:rotate(45deg); background:linear-gradient(135deg,#ff8ec4,#ff6fae); box-shadow:0 10px 20px -6px rgba(255,110,170,.7); display:grid; place-items:center; animation:floatYs 3s ease-in-out infinite;"><span style="transform:rotate(-45deg); font-size:20px;">🧸</span></span>
+          </div>
+          <div style="position:absolute; left:14px; bottom:14px; padding:9px 15px; border-radius:14px; background:rgba(255,255,255,.85); backdrop-filter:blur(6px); font-family:'Fredoka',sans-serif; font-weight:600; font-size:13px; color:var(--ink);">📍 106, Green Road, Trincomalee</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FOOTER ====== -->
+  <footer style="position:relative; z-index:2; text-align:center; padding:clamp(40px,5vw,64px) 24px calc(clamp(36px,4vw,56px) + env(safe-area-inset-bottom));">
+    <div style="display:flex; gap:10px; justify-content:center; margin-bottom:16px; font-size:24px;">
+      <span style="animation:bob 4s ease-in-out infinite;">🌟</span>
+      <span style="animation:bob 4s ease-in-out .4s infinite;">🧸</span>
+      <span style="animation:bob 4s ease-in-out .8s infinite;">🎈</span>
+    </div>
+    <strong style="font-family:'Fredoka',sans-serif; font-weight:700; font-size:clamp(18px,3vw,26px); color:var(--ink);">Children Day Care Center</strong>
+    <p style="margin:8px 0 0; font-weight:700; letter-spacing:1px; color:var(--ink-soft);">Safe • Happy • Nurturing • Creative</p>
+    <p style="margin:18px 0 0; font-size:13px; color:var(--ink-soft); opacity:.8;">106, Green Road, Trincomalee &nbsp;•&nbsp; 071 036 5378</p>
+  </footer>
+
+  <!-- ====== MOBILE STICKY CTA ====== -->
+  <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; left:0; right:0; bottom:0; z-index:50; display:flex; gap:10px; padding:10px 12px calc(10px + env(safe-area-inset-bottom)); background:var(--glass); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); border-top:1.5px solid var(--glass-brd); box-shadow:0 -12px 30px -16px rgba(120,90,200,.45);">
+      <a href="{{ telHref }}" style="flex:1; text-decoration:none; text-align:center; font-family:'Fredoka',sans-serif; font-weight:600; color:#fff; padding:14px; border-radius:16px; background:linear-gradient(135deg,#ff8ec4,#ff6fae); box-shadow:0 10px 22px -10px rgba(255,110,170,.8);">📞 Call</a>
+      <a href="{{ waHref }}" target="_blank" rel="noopener" style="flex:1; text-decoration:none; text-align:center; font-family:'Fredoka',sans-serif; font-weight:600; color:#fff; padding:14px; border-radius:16px; background:linear-gradient(135deg,var(--wa),var(--wa-d)); box-shadow:0 10px 22px -10px rgba(45,168,87,.8);">💬 WhatsApp</a>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = {
+    menuOpen: false,
+    isMobile: (typeof window !== 'undefined' ? window.innerWidth < 860 : false)
+  };
+
+  componentDidMount() {
+    this._onResize = () => {
+      const m = window.innerWidth < 860;
+      if (m !== this.state.isMobile) this.setState({ isMobile: m, menuOpen: false });
+    };
+    window.addEventListener('resize', this._onResize);
+
+    // Close the mobile navigation when tapping outside it or pressing Escape.
+    this._onOutsideMenu = (event) => {
+      if (!this.state.menuOpen) return;
+      const nav = document.querySelector('[data-mobile-nav]');
+      if (nav && !nav.contains(event.target)) this.setState({ menuOpen: false });
+    };
+    this._onMenuKey = (event) => {
+      if (event.key === 'Escape' && this.state.menuOpen) this.setState({ menuOpen: false });
+    };
+    document.addEventListener('pointerdown', this._onOutsideMenu);
+    document.addEventListener('keydown', this._onMenuKey);
+
+    // Keep the themed header selection synchronized with the visible section.
+    const navSectionIds = ['home','why','activities','play','gallery','contact'];
+    this._activeSection = 'home';
+    this._setActiveNav = (id) => {
+      this._activeSection = id;
+      document.querySelectorAll('[data-nav],[data-mobile-nav-link]').forEach(link => {
+        const active = link.dataset.section === id;
+        link.classList.toggle('is-active', active);
+        if (active) link.setAttribute('aria-current', 'page');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    const updateActiveSection = () => {
+      this._navRaf = 0;
+      const pageBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 6;
+      let active = pageBottom ? 'contact' : 'home';
+      if (!pageBottom) {
+        const marker = window.scrollY + 150;
+        navSectionIds.forEach(id => {
+          const section = document.getElementById(id);
+          if (section && section.offsetTop <= marker) active = id;
+        });
+      }
+      this._setActiveNav(active);
+    };
+    this._onNavSectionScroll = () => {
+      if (this._navRaf) return;
+      this._navRaf = requestAnimationFrame(updateActiveSection);
+    };
+    window.addEventListener('scroll', this._onNavSectionScroll, { passive: true });
+    updateActiveSection();
+
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const coarse = window.matchMedia('(pointer: coarse)').matches;
+
+    // ---- Scroll reveal ----
+    const els = Array.from(document.querySelectorAll('[data-reveal]'));
+    if (reduce) {
+      els.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+    } else {
+      // NB: never animate opacity. Throttled/background iframes freeze the
+      // animation timeline, which would leave an opacity keyframe stuck at 0
+      // (invisible). We keep opacity:1 at all times and animate only transform,
+      // so worst case the element is merely offset — never hidden.
+      els.forEach((el) => { el.style.transform = 'translateY(26px)'; el.style.willChange = 'transform'; });
+      const reveal = (el) => {
+        if (el.dataset.revealed) return;
+        el.dataset.revealed = '1';
+        el.style.transform = 'none';
+        try {
+          el.animate(
+            [{ transform: 'translateY(26px)' }, { transform: 'none' }],
+            { duration: 650, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'none' }
+          );
+        } catch (e) { /* WAAPI unsupported — already in place */ }
+        // setTimeout still fires in throttled iframes (unlike rAF/animation time):
+        // cancel any stuck entrance animation so the element settles to transform:none.
+        setTimeout(() => {
+          el.style.willChange = '';
+          try { el.getAnimations().forEach(a => a.cancel()); } catch (e) {}
+          el.style.transform = 'none';
+        }, 720);
+      };
+      const pending = new Set(els);
+      const checkInView = () => {
+        const h = window.innerHeight || document.documentElement.clientHeight;
+        pending.forEach(el => {
+          const r = el.getBoundingClientRect();
+          if (r.top < h * 0.92 && r.bottom > 0) { reveal(el); pending.delete(el); }
+        });
+        if (this._io && pending.size === 0) { this._io.disconnect(); this._io = null; }
+      };
+      // Primary: IntersectionObserver
+      try {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach(e => {
+            if (e.isIntersecting && pending.has(e.target)) { reveal(e.target); pending.delete(e.target); io.unobserve(e.target); }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
+        els.forEach(el => io.observe(el));
+        this._io = io;
+      } catch (err) { /* ignore */ }
+      // Fallback 1: immediate + scroll-driven viewport check
+      checkInView();
+      this._onScroll = () => { if (this._rafScroll) return; this._rafScroll = requestAnimationFrame(() => { this._rafScroll = 0; checkInView(); }); };
+      window.addEventListener('scroll', this._onScroll, { passive: true });
+      window.addEventListener('resize', this._onScroll, { passive: true });
+      // Fallback 2: safety net — never leave content hidden
+      this._safety = setTimeout(() => { pending.forEach(reveal); pending.clear(); }, 1600);
+    }
+
+    // ---- 3D tilt (desktop, fine pointer) ----
+    if (!reduce && !coarse) {
+      this._tiltHandlers = [];
+      document.querySelectorAll('[data-tilt]').forEach(card => {
+        const base = card.style.transition;
+        const move = (ev) => {
+          const r = card.getBoundingClientRect();
+          const px = (ev.clientX - r.left) / r.width - 0.5;
+          const py = (ev.clientY - r.top) / r.height - 0.5;
+          card.style.transition = 'transform .08s linear';
+          card.style.transform = `perspective(700px) rotateY(${px * 8}deg) rotateX(${-py * 8}deg) translateY(-8px)`;
+        };
+        const leave = () => { card.style.transition = base || 'transform .3s'; card.style.transform = ''; };
+        card.addEventListener('mousemove', move);
+        card.addEventListener('mouseleave', leave);
+        this._tiltHandlers.push([card, move, leave]);
+      });
+    }
+
+    // ---- 3D Bento: spring entrance + cursor-following glow + pronounced 3D tilt ----
+    const bentoCards = Array.from(document.querySelectorAll('[data-bento-card]'));
+    if (bentoCards.length) {
+      this._bentoTimers = [];
+      this._bentoHandlers = [];
+
+      const addBentoHandler = (el, type, fn, opts) => {
+        el.addEventListener(type, fn, opts);
+        this._bentoHandlers.push([el, type, fn]);
+      };
+
+      const revealCard = (card) => {
+        if (card.dataset.bentoRevealed === '1') return;
+        const i = Number(card.dataset.bentoIndex || 0);
+        card.style.transitionDelay = `${i * 75}ms`;
+        card.dataset.bentoRevealed = '1';
+        const t = setTimeout(() => {
+          card.style.transitionDelay = '0ms';
+          if (card.dataset.bentoHover !== '1') {
+            card.style.transition = 'box-shadow .35s ease, transform .55s cubic-bezier(.34,1.56,.64,1), filter .35s ease';
+          }
+        }, 920 + i * 75);
+        this._bentoTimers.push(t);
+      };
+
+      const bentoState = new WeakMap();
+      const setGlow = (glow, px, py, opacity) => {
+        if (!glow) return;
+        glow.style.setProperty('--mx', (px * 100) + '%');
+        glow.style.setProperty('--my', (py * 100) + '%');
+        glow.style.opacity = String(opacity);
+      };
+
+      const activateCard = (card, px, py, liveTilt) => {
+        const st = bentoState.get(card);
+        const rx = -(py - .5) * 15;
+        const ry = (px - .5) * 18;
+        card.dataset.bentoHover = '1';
+        card.style.transition = liveTilt ? 'transform .09s linear, box-shadow .22s ease' : 'transform .45s cubic-bezier(.34,1.56,.64,1), box-shadow .24s ease';
+        card.style.transform = liveTilt
+          ? `perspective(960px) rotateX(${rx}deg) rotateY(${ry}deg) translate3d(0,-10px,34px) scale(1.025)`
+          : 'perspective(960px) rotateX(-5deg) rotateY(0deg) translate3d(0,-8px,24px) scale(1.015)';
+        if (st && st.icon) {
+          const ix = (px - .5) * 14;
+          const iy = (py - .5) * -10;
+          st.icon.style.transform = `translateZ(${st.baseIconZ + 72}px) translate3d(${ix}px,${iy}px,0) rotate(${(px - .5) * 12}deg) scale(1.14)`;
+        }
+        if (st) setGlow(st.glow, px, py, 1);
+      };
+
+      const resetCard = (card) => {
+        const st = bentoState.get(card);
+        delete card.dataset.bentoHover;
+        card.style.transition = 'transform .55s cubic-bezier(.34,1.56,.64,1), box-shadow .35s ease, filter .35s ease';
+        card.style.transform = '';
+        if (st && st.icon) st.icon.style.transform = st.baseIconTransform;
+        if (st) setGlow(st.glow, .5, .5, 0);
+      };
+
+      bentoCards.forEach((card, i) => {
+        const icon = card.querySelector('[data-bento-icon]');
+        const glow = card.querySelector('[data-bento-glow]');
+        const baseIconTransform = icon ? (icon.style.transform || '') : '';
+        const m = baseIconTransform.match(/translateZ\(([-\d.]+)px\)/);
+        bentoState.set(card, {
+          icon,
+          glow,
+          baseIconTransform,
+          baseIconZ: m ? parseFloat(m[1]) : 40
+        });
+        card.dataset.bentoIndex = String(i);
+        if (!card.hasAttribute('tabindex')) card.tabIndex = 0;
+        if (!card.getAttribute('role')) card.setAttribute('role', 'listitem');
+
+        if (reduce) {
+          card.dataset.bentoRevealed = '1';
+          card.style.transform = 'none';
+          return;
+        }
+
+        card.dataset.bentoReady = '1';
+        card.style.transition = 'filter .48s ease, transform .76s cubic-bezier(.16,1.12,.32,1), box-shadow .35s ease';
+      });
+
+      if (!reduce) {
+        try {
+          const bio = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+              if (e.isIntersecting) {
+                revealCard(e.target);
+                bio.unobserve(e.target);
+              }
+            });
+          }, { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+          bentoCards.forEach(c => bio.observe(c));
+          this._bio = bio;
+        } catch (err) {
+          bentoCards.forEach(revealCard);
+        }
+
+        const quickReveal = () => {
+          const h = window.innerHeight || document.documentElement.clientHeight;
+          bentoCards.forEach(card => {
+            const r = card.getBoundingClientRect();
+            if (r.top < h * 0.94 && r.bottom > 0) revealCard(card);
+          });
+        };
+        quickReveal();
+        this._bentoSafety = setTimeout(() => bentoCards.forEach(revealCard), 1900);
+
+        bentoCards.forEach(card => {
+          const focus = () => activateCard(card, .5, .42, false);
+          const blur = () => resetCard(card);
+          addBentoHandler(card, 'focus', focus);
+          addBentoHandler(card, 'blur', blur);
+
+          if (coarse) {
+            const tap = () => {
+              activateCard(card, .5, .4, false);
+              const t = setTimeout(() => resetCard(card), 420);
+              this._bentoTimers.push(t);
+            };
+            addBentoHandler(card, 'pointerdown', tap, { passive: true });
+            return;
+          }
+
+          const enter = () => { card.dataset.bentoHover = '1'; };
+          const move = (ev) => {
+            const r = card.getBoundingClientRect();
+            const px = Math.max(0, Math.min(1, (ev.clientX - r.left) / r.width));
+            const py = Math.max(0, Math.min(1, (ev.clientY - r.top) / r.height));
+            activateCard(card, px, py, true);
+          };
+          const leave = () => resetCard(card);
+          addBentoHandler(card, 'pointerenter', enter, { passive: true });
+          addBentoHandler(card, 'pointermove', move, { passive: true });
+          addBentoHandler(card, 'pointerleave', leave, { passive: true });
+        });
+      }
+    }
+
+    // ---- Rainbow Play Garden game navigation ----
+    const gamePickers = Array.from(document.querySelectorAll('[data-game-picker]'));
+    const gamePanels = Array.from(document.querySelectorAll('[data-game-panel]'));
+    this._patternHandlers = [];
+    this._patternTimers = [];
+    const showGame = (name) => {
+      gamePickers.forEach(button => {
+        const active = button.dataset.gamePicker === name;
+        button.setAttribute('aria-selected', String(active));
+        button.tabIndex = active ? 0 : -1;
+      });
+      gamePanels.forEach(panel => { panel.hidden = panel.dataset.gamePanel !== name; });
+    };
+    const goToNextAdventure = (name) => {
+      showGame(name);
+      const picker = gamePickers.find(button => button.dataset.gamePicker === name);
+      if (picker && !reduce) picker.animate(
+        [{ transform:'scale(1)' }, { transform:'scale(1.08)' }, { transform:'scale(1)' }],
+        { duration:420, easing:'ease-out' }
+      );
+    };
+    let restartMemoryGame = null;
+    if (gamePickers.length && gamePanels.length) {
+      gamePickers.forEach(button => {
+        const onPick = () => showGame(button.dataset.gamePicker);
+        const onKey = (e) => {
+          if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+          e.preventDefault();
+          const index = gamePickers.indexOf(button);
+          const next = gamePickers[(index + (e.key === 'ArrowRight' ? 1 : -1) + gamePickers.length) % gamePickers.length];
+          showGame(next.dataset.gamePicker);
+          next.focus();
+        };
+        button.addEventListener('click', onPick);
+        button.addEventListener('keydown', onKey);
+        this._patternHandlers.push([button, 'click', onPick], [button, 'keydown', onKey]);
+      });
+      showGame('memory');
+    }
+
+    // ---- Rainbow Play Garden memory game ----
+    const gameBoard = document.querySelector('[data-game-board]');
+    if (gameBoard) {
+      const gameShell = document.querySelector('[data-game-shell]');
+      const matchLabel = document.querySelector('[data-game-matches]');
+      const turnLabel = document.querySelector('[data-game-turns]');
+      const statusLabel = document.querySelector('[data-game-status]');
+      const celebration = document.querySelector('[data-game-celebration]');
+      const restartButton = document.querySelector('[data-game-restart]');
+      const levelButtons = Array.from(document.querySelectorAll('[data-game-level]'));
+      const memoryNext = document.createElement('button');
+      memoryNext.type = 'button';
+      memoryNext.hidden = true;
+      memoryNext.textContent = 'Next Adventure →';
+      memoryNext.style.cssText = "border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;width:max-content;margin:10px auto 0;font-family:'Fredoka',sans-serif;font-weight:600;font-size:17px;color:#fff;padding:12px 24px;border-radius:17px;background:linear-gradient(135deg,#ff8ec4,#8b6ee8);box-shadow:0 13px 24px -12px rgba(139,110,232,.8);";
+      statusLabel.insertAdjacentElement('afterend', memoryNext);
+      const symbols = ['🦁','🦋','🚀','🌈','🐳','🧸','🚗','🌻','🦖','🍓','🐰','⭐'];
+      const praise = ['Wonderful match! 🌟','You found a pair! 🎉','Brilliant! Keep going! ✨','Great remembering! 🌈'];
+      let pairCount = 4;
+      let firstCard = null;
+      let secondCard = null;
+      let locked = false;
+      let matches = 0;
+      let turns = 0;
+      this._gameTimers = [];
+      this._gameHandlers = [];
+
+      const later = (fn, delay) => {
+        const timer = setTimeout(fn, delay);
+        this._gameTimers.push(timer);
+        return timer;
+      };
+      const shuffle = (items) => {
+        const copy = items.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      };
+      const updateScore = () => {
+        matchLabel.textContent = `${matches} / ${pairCount}`;
+        turnLabel.textContent = String(turns);
+      };
+      const burst = (big = false) => {
+        if (!celebration || reduce) return;
+        const icons = ['★','✦','♥','●','🌟','🎉'];
+        const total = big ? 30 : 10;
+        for (let i = 0; i < total; i++) {
+          const bit = document.createElement('span');
+          const angle = (i / total) * Math.PI * 2 + Math.random() * .35;
+          const distance = (big ? 100 : 55) + Math.random() * (big ? 190 : 80);
+          bit.className = 'game-confetti';
+          bit.textContent = icons[i % icons.length];
+          bit.style.color = ['#ff7eb8','#ffd45e','#58d6a8','#6fb8ff','#b07bff'][i % 5];
+          bit.style.setProperty('--cx', `${Math.cos(angle) * distance}px`);
+          bit.style.setProperty('--cy', `${Math.sin(angle) * distance}px`);
+          bit.style.animationDelay = `${Math.random() * 100}ms`;
+          celebration.appendChild(bit);
+          later(() => bit.remove(), 1200);
+        }
+      };
+      const finishGame = () => {
+        locked = true;
+        statusLabel.textContent = `You found every pair in ${turns} turns — amazing! 🏆`;
+        memoryNext.hidden = false;
+        burst(true);
+        if (!reduce && gameShell) {
+          gameShell.animate(
+            [{ transform: 'scale(1)' }, { transform: 'scale(1.012)' }, { transform: 'scale(1)' }],
+            { duration: 700, easing: 'ease-out' }
+          );
+        }
+        later(() => { locked = false; }, 900);
+      };
+      const chooseCard = (card) => {
+        if (locked || card === firstCard || card.classList.contains('is-matched')) return;
+        card.classList.add('is-open');
+        card.setAttribute('aria-pressed', 'true');
+        if (!firstCard) {
+          firstCard = card;
+          statusLabel.textContent = 'Now find its matching friend!';
+          return;
+        }
+        secondCard = card;
+        locked = true;
+        turns += 1;
+        updateScore();
+        if (firstCard.dataset.symbol === secondCard.dataset.symbol) {
+          const a = firstCard;
+          const b = secondCard;
+          a.classList.add('is-matched');
+          b.classList.add('is-matched');
+          a.setAttribute('aria-label', `Matched ${a.dataset.name}`);
+          b.setAttribute('aria-label', `Matched ${b.dataset.name}`);
+          matches += 1;
+          updateScore();
+          statusLabel.textContent = praise[(matches - 1) % praise.length];
+          firstCard = null;
+          secondCard = null;
+          locked = false;
+          burst(false);
+          if (matches === pairCount) later(finishGame, 380);
+        } else {
+          statusLabel.textContent = 'Almost! Let’s try again.';
+          const a = firstCard;
+          const b = secondCard;
+          later(() => {
+            a.classList.remove('is-open');
+            b.classList.remove('is-open');
+            a.setAttribute('aria-pressed', 'false');
+            b.setAttribute('aria-pressed', 'false');
+            firstCard = null;
+            secondCard = null;
+            locked = false;
+            statusLabel.textContent = 'Choose two cards to find a pair!';
+          }, 720);
+        }
+      };
+      const startGame = (count = pairCount) => {
+        this._gameTimers.forEach(clearTimeout);
+        this._gameTimers = [];
+        this._gameHandlers = this._gameHandlers.filter(([el, type, fn]) => {
+          if (el.classList && el.classList.contains('memory-card')) {
+            el.removeEventListener(type, fn);
+            return false;
+          }
+          return true;
+        });
+        pairCount = count;
+        firstCard = null;
+        secondCard = null;
+        locked = false;
+        matches = 0;
+        turns = 0;
+        statusLabel.textContent = 'Choose two cards to begin!';
+        memoryNext.hidden = true;
+        celebration.innerHTML = '';
+        gameBoard.innerHTML = '';
+        gameBoard.dataset.pairs = String(pairCount);
+        updateScore();
+        levelButtons.forEach(btn => btn.setAttribute('aria-pressed', String(Number(btn.dataset.gameLevel) === pairCount)));
+        const names = {'🦁':'lion','🦋':'butterfly','🚀':'rocket','🌈':'rainbow','🐳':'whale','🧸':'teddy bear','🚗':'car','🌻':'sunflower','🦖':'dinosaur','🍓':'strawberry','🐰':'rabbit','⭐':'star'};
+        const deck = shuffle(symbols).slice(0, pairCount);
+        shuffle(deck.concat(deck)).forEach((symbol, index) => {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = 'memory-card';
+          card.dataset.symbol = symbol;
+          card.dataset.name = names[symbol];
+          card.setAttribute('role', 'gridcell');
+          card.setAttribute('aria-label', 'Hidden card');
+          card.setAttribute('aria-pressed', 'false');
+          card.style.setProperty('--deal', `${index * 45}ms`);
+          card.innerHTML = `<span class="memory-card-face memory-card-back" aria-hidden="true">?</span><span class="memory-card-face memory-card-front" aria-hidden="true">${symbol}</span>`;
+          const onChoose = () => chooseCard(card);
+          card.addEventListener('click', onChoose);
+          this._gameHandlers.push([card, 'click', onChoose]);
+          gameBoard.appendChild(card);
+        });
+      };
+      levelButtons.forEach(button => {
+        const onLevel = () => startGame(Number(button.dataset.gameLevel));
+        button.addEventListener('click', onLevel);
+        this._gameHandlers.push([button, 'click', onLevel]);
+      });
+      const onRestart = () => startGame(pairCount);
+      restartButton.addEventListener('click', onRestart);
+      this._gameHandlers.push([restartButton, 'click', onRestart]);
+      const onMemoryNext = () => goToNextAdventure('pattern');
+      memoryNext.addEventListener('click', onMemoryNext);
+      this._gameHandlers.push([memoryNext, 'click', onMemoryNext]);
+      restartMemoryGame = () => startGame(pairCount);
+      startGame(4);
+    }
+
+    // ---- "What Comes Next?" pattern game ----
+    const patternSequence = document.querySelector('[data-pattern-sequence]');
+    const patternChoices = document.querySelector('[data-pattern-choices]');
+    const patternRound = document.querySelector('[data-pattern-round]');
+    const patternStatus = document.querySelector('[data-pattern-status]');
+    const patternNext = document.querySelector('[data-pattern-next]');
+    const patternCelebration = document.querySelector('[data-pattern-celebration]');
+    if (patternSequence && patternChoices && patternNext) {
+      const patternDeck = [
+        { items:['🌻','🦋','🌻','🦋'], answer:'🌻', choices:['🚀','🌻','🦋'] },
+        { items:['🚗','⭐','🚗','⭐'], answer:'🚗', choices:['⭐','🚗','🐳'] },
+        { items:['🍓','🍓','🐰','🍓','🍓'], answer:'🐰', choices:['🍓','🦖','🐰'] },
+        { items:['🚀','🌈','🌈','🚀','🌈','🌈'], answer:'🚀', choices:['🌈','🚗','🚀'] },
+        { items:['🦖','🐳','🦖','🐳'], answer:'🦖', choices:['🐳','🦖','🧸'] }
+      ];
+      let patternIndex = 0;
+      let patternSolved = false;
+      let patternComplete = false;
+      const patternLater = (fn, delay) => {
+        const timer = setTimeout(fn, delay);
+        this._patternTimers.push(timer);
+      };
+      const patternBurst = () => {
+        if (reduce || !patternCelebration) return;
+        const icons = ['★','✦','●','♥'];
+        for (let i = 0; i < 16; i++) {
+          const bit = document.createElement('span');
+          const angle = (i / 16) * Math.PI * 2;
+          const distance = 70 + Math.random() * 150;
+          bit.className = 'game-confetti';
+          bit.textContent = icons[i % icons.length];
+          bit.style.color = ['#ff7eb8','#ffd45e','#58d6a8','#6fb8ff'][i % 4];
+          bit.style.setProperty('--cx', `${Math.cos(angle) * distance}px`);
+          bit.style.setProperty('--cy', `${Math.sin(angle) * distance}px`);
+          patternCelebration.appendChild(bit);
+          patternLater(() => bit.remove(), 1150);
+        }
+      };
+      const renderPattern = () => {
+        this._patternHandlers = this._patternHandlers.filter(([el, type, fn]) => {
+          if (el.classList && el.classList.contains('pattern-choice')) {
+            el.removeEventListener(type, fn);
+            return false;
+          }
+          return true;
+        });
+        patternSolved = false;
+        patternComplete = false;
+        const puzzle = patternDeck[patternIndex];
+        patternRound.textContent = `Round ${patternIndex + 1} of ${patternDeck.length}`;
+        patternStatus.textContent = 'Tap the picture that comes next!';
+        patternNext.hidden = true;
+        patternCelebration.innerHTML = '';
+        patternSequence.innerHTML = '';
+        patternChoices.innerHTML = '';
+        puzzle.items.forEach((symbol, index) => {
+          const item = document.createElement('span');
+          item.className = 'pattern-item';
+          item.setAttribute('aria-hidden', 'true');
+          item.style.setProperty('--deal', `${index * 55}ms`);
+          item.textContent = symbol;
+          patternSequence.appendChild(item);
+        });
+        const question = document.createElement('span');
+        question.className = 'pattern-item is-question';
+        question.setAttribute('aria-label', 'Missing picture');
+        question.style.setProperty('--deal', `${puzzle.items.length * 55}ms`);
+        question.textContent = '?';
+        patternSequence.appendChild(question);
+        puzzle.choices.forEach(symbol => {
+          const choice = document.createElement('button');
+          choice.type = 'button';
+          choice.className = 'pattern-choice';
+          choice.textContent = symbol;
+          choice.setAttribute('aria-label', `Choose ${symbol}`);
+          const choose = () => {
+            if (patternSolved) return;
+            if (symbol === puzzle.answer) {
+              patternSolved = true;
+              choice.classList.add('is-correct');
+              question.textContent = symbol;
+              question.classList.remove('is-question');
+              patternStatus.textContent = patternIndex === patternDeck.length - 1 ? 'You completed every pattern! Amazing! 🏆' : 'That’s right! You found the pattern! 🌟';
+              patternNext.textContent = patternIndex === patternDeck.length - 1 ? 'Play Again ↻' : 'Next Round →';
+              patternComplete = patternIndex === patternDeck.length - 1;
+              if (patternComplete) patternNext.textContent = 'Next Adventure →';
+              patternNext.hidden = false;
+              patternBurst();
+            } else {
+              choice.classList.add('is-wrong');
+              patternStatus.textContent = 'Good try! Look at the pattern once more.';
+              patternLater(() => choice.classList.remove('is-wrong'), 420);
+            }
+          };
+          choice.addEventListener('click', choose);
+          this._patternHandlers.push([choice, 'click', choose]);
+          patternChoices.appendChild(choice);
+        });
+      };
+      const onPatternNext = () => {
+        if (patternComplete) {
+          patternIndex = 0;
+          renderPattern();
+          goToNextAdventure('feed');
+          return;
+        }
+        patternIndex = (patternIndex + 1) % patternDeck.length;
+        renderPattern();
+      };
+      patternNext.addEventListener('click', onPatternNext);
+      this._patternHandlers.push([patternNext, 'click', onPatternNext]);
+      renderPattern();
+    }
+
+    // ---- "Feed a Friend" animal-and-food game ----
+    const feedFriend = document.querySelector('[data-feed-friend]');
+    const foodChoices = document.querySelector('[data-food-choices]');
+    const feedRound = document.querySelector('[data-feed-round]');
+    const feedTitle = document.querySelector('[data-feed-title]');
+    const feedStatus = document.querySelector('[data-feed-status]');
+    const feedNext = document.querySelector('[data-feed-next]');
+    const feedCelebration = document.querySelector('[data-feed-celebration]');
+    this._feedHandlers = [];
+    this._feedTimers = [];
+    if (feedFriend && foodChoices && feedNext) {
+      const friends = [
+        { name:'Bunny', animal:'🐰', answer:'🥕', foods:['🍌','🥕','🐟'] },
+        { name:'Monkey', animal:'🐵', answer:'🍌', foods:['🍌','🧀','🥬'] },
+        { name:'Panda', animal:'🐼', answer:'🎋', foods:['🍓','🎋','🐟'] },
+        { name:'Mouse', animal:'🐭', answer:'🧀', foods:['🥕','🍉','🧀'] },
+        { name:'Kitten', animal:'🐱', answer:'🐟', foods:['🎋','🐟','🍌'] }
+      ];
+      let friendIndex = 0;
+      let friendFed = false;
+      let friendComplete = false;
+      const feedLater = (fn, delay) => {
+        const timer = setTimeout(fn, delay);
+        this._feedTimers.push(timer);
+      };
+      const feedBurst = () => {
+        if (reduce || !feedCelebration) return;
+        const icons = ['♥','★','✦','●'];
+        for (let i = 0; i < 16; i++) {
+          const bit = document.createElement('span');
+          const angle = (i / 16) * Math.PI * 2;
+          const distance = 70 + Math.random() * 150;
+          bit.className = 'game-confetti';
+          bit.textContent = icons[i % icons.length];
+          bit.style.color = ['#ff7eb8','#ffd45e','#58d6a8','#8b6ee8'][i % 4];
+          bit.style.setProperty('--cx', `${Math.cos(angle) * distance}px`);
+          bit.style.setProperty('--cy', `${Math.sin(angle) * distance}px`);
+          feedCelebration.appendChild(bit);
+          feedLater(() => bit.remove(), 1150);
+        }
+      };
+      const renderFriend = () => {
+        this._feedHandlers = this._feedHandlers.filter(([el, type, fn]) => {
+          if (el.classList && el.classList.contains('food-choice')) {
+            el.removeEventListener(type, fn);
+            return false;
+          }
+          return true;
+        });
+        friendFed = false;
+        friendComplete = false;
+        const friend = friends[friendIndex];
+        feedRound.textContent = `Friend ${friendIndex + 1} of ${friends.length}`;
+        feedTitle.textContent = `What does ${friend.name} love to eat?`;
+        feedFriend.textContent = friend.animal;
+        feedFriend.setAttribute('aria-label', `Hungry ${friend.name}`);
+        feedStatus.textContent = `Tap the food ${friend.name} likes!`;
+        feedNext.hidden = true;
+        feedCelebration.innerHTML = '';
+        foodChoices.innerHTML = '';
+        friend.foods.forEach((food, index) => {
+          const choice = document.createElement('button');
+          choice.type = 'button';
+          choice.className = 'food-choice';
+          choice.textContent = food;
+          choice.setAttribute('aria-label', `Choose ${food}`);
+          choice.style.setProperty('--deal', `${index * 80}ms`);
+          const chooseFood = () => {
+            if (friendFed) return;
+            if (food === friend.answer) {
+              friendFed = true;
+              choice.classList.add('is-correct');
+              feedStatus.textContent = `${friend.name} is happy and full! Great choice! 💚`;
+              feedNext.textContent = friendIndex === friends.length - 1 ? 'Play Again ↻' : 'Next Friend →';
+              friendComplete = friendIndex === friends.length - 1;
+              if (friendComplete) feedNext.textContent = 'Next Adventure →';
+              feedNext.hidden = false;
+              feedBurst();
+              if (!reduce) {
+                feedFriend.animate(
+                  [{ transform:'scale(1) rotate(0)' },{ transform:'scale(1.16) rotate(-6deg)' },{ transform:'scale(1.08) rotate(6deg)' },{ transform:'scale(1) rotate(0)' }],
+                  { duration:650,easing:'ease-out' }
+                );
+              }
+            } else {
+              choice.classList.add('is-wrong');
+              feedStatus.textContent = `Not this one—what else might ${friend.name} enjoy?`;
+              feedLater(() => choice.classList.remove('is-wrong'), 420);
+            }
+          };
+          choice.addEventListener('click', chooseFood);
+          this._feedHandlers.push([choice, 'click', chooseFood]);
+          foodChoices.appendChild(choice);
+        });
+      };
+      const onFeedNext = () => {
+        if (friendComplete) {
+          friendIndex = 0;
+          renderFriend();
+          goToNextAdventure('balloon');
+          return;
+        }
+        friendIndex = (friendIndex + 1) % friends.length;
+        renderFriend();
+      };
+      feedNext.addEventListener('click', onFeedNext);
+      this._feedHandlers.push([feedNext, 'click', onFeedNext]);
+      renderFriend();
+    }
+
+    // ---- "Colour Balloon Pop" recognition game ----
+    const balloonField = document.querySelector('[data-balloon-field]');
+    const balloonRound = document.querySelector('[data-balloon-round]');
+    const balloonColour = document.querySelector('[data-balloon-colour]');
+    const balloonStatus = document.querySelector('[data-balloon-status]');
+    const balloonNext = document.querySelector('[data-balloon-next]');
+    const balloonCelebration = document.querySelector('[data-balloon-celebration]');
+    this._balloonHandlers = [];
+    this._balloonTimers = [];
+    if (balloonField && balloonNext) {
+      const colours = [
+        { name:'purple', value:'#9b78ee' },
+        { name:'pink', value:'#ff7eb8' },
+        { name:'blue', value:'#63b3ed' },
+        { name:'green', value:'#58cfa1' },
+        { name:'yellow', value:'#ffd45e' }
+      ];
+      let colourIndex = 0;
+      let balloonsLeft = 3;
+      let balloonComplete = false;
+      const balloonLater = (fn, delay) => {
+        const timer = setTimeout(fn, delay);
+        this._balloonTimers.push(timer);
+      };
+      const balloonShuffle = (items) => {
+        const copy = items.slice();
+        for (let i = copy.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [copy[i], copy[j]] = [copy[j], copy[i]];
+        }
+        return copy;
+      };
+      const balloonBurst = () => {
+        if (reduce || !balloonCelebration) return;
+        for (let i = 0; i < 18; i++) {
+          const bit = document.createElement('span');
+          const angle = (i / 18) * Math.PI * 2;
+          const distance = 70 + Math.random() * 170;
+          bit.className = 'game-confetti';
+          bit.textContent = ['★','✦','●','♥'][i % 4];
+          bit.style.color = colours[i % colours.length].value;
+          bit.style.setProperty('--cx', `${Math.cos(angle) * distance}px`);
+          bit.style.setProperty('--cy', `${Math.sin(angle) * distance}px`);
+          balloonCelebration.appendChild(bit);
+          balloonLater(() => bit.remove(), 1150);
+        }
+      };
+      const renderBalloons = () => {
+        this._balloonHandlers = this._balloonHandlers.filter(([el, type, fn]) => {
+          if (el.classList && el.classList.contains('pop-balloon')) {
+            el.removeEventListener(type, fn);
+            return false;
+          }
+          return true;
+        });
+        const target = colours[colourIndex];
+        balloonComplete = false;
+        balloonsLeft = 3;
+        balloonRound.textContent = `Round ${colourIndex + 1} of ${colours.length}`;
+        balloonColour.textContent = target.name;
+        balloonColour.style.color = target.value;
+        balloonStatus.textContent = `Find all 3 ${target.name} balloons!`;
+        balloonNext.hidden = true;
+        balloonCelebration.innerHTML = '';
+        balloonField.innerHTML = '';
+        const others = colours.filter(c => c !== target);
+        const deck = [target,target,target,others[0],others[1],others[2],others[3],others[(colourIndex + 1) % others.length]];
+        balloonShuffle(deck).forEach((colour, index) => {
+          const balloon = document.createElement('button');
+          balloon.type = 'button';
+          balloon.className = 'pop-balloon';
+          balloon.style.setProperty('--balloon', colour.value);
+          balloon.style.setProperty('--sway', `${3.1 + (index % 4) * .35}s`);
+          balloon.style.setProperty('--delay', `${index * -170}ms`);
+          balloon.setAttribute('aria-label', `${colour.name} balloon`);
+          const pop = () => {
+            if (balloon.classList.contains('is-popped')) return;
+            if (colour === target) {
+              balloon.classList.add('is-popped');
+              balloon.setAttribute('aria-label', `Popped ${colour.name} balloon`);
+              balloonsLeft -= 1;
+              if (balloonsLeft > 0) {
+                balloonStatus.textContent = `Great pop! ${balloonsLeft} ${target.name} balloon${balloonsLeft === 1 ? '' : 's'} left.`;
+              } else {
+                balloonStatus.textContent = `You popped every ${target.name} balloon! Brilliant! 🎉`;
+                balloonNext.textContent = colourIndex === colours.length - 1 ? 'Play Again ↻' : 'Next Colour →';
+                balloonComplete = colourIndex === colours.length - 1;
+                if (balloonComplete) balloonNext.textContent = 'Back to Memory Match →';
+                balloonNext.hidden = false;
+                balloonBurst();
+              }
+            } else {
+              balloon.classList.add('is-oops');
+              balloonStatus.textContent = `That one is ${colour.name}. Look for ${target.name}!`;
+              balloonLater(() => balloon.classList.remove('is-oops'), 390);
+            }
+          };
+          balloon.addEventListener('click', pop);
+          this._balloonHandlers.push([balloon, 'click', pop]);
+          balloonField.appendChild(balloon);
+        });
+      };
+      const onBalloonNext = () => {
+        if (balloonComplete) {
+          colourIndex = 0;
+          renderBalloons();
+          if (restartMemoryGame) restartMemoryGame();
+          goToNextAdventure('memory');
+          return;
+        }
+        colourIndex = (colourIndex + 1) % colours.length;
+        renderBalloons();
+      };
+      balloonNext.addEventListener('click', onBalloonNext);
+      this._balloonHandlers.push([balloonNext, 'click', onBalloonNext]);
+      renderBalloons();
+    }
+
+    // ---- Auto-scrolling framed moments gallery ----
+    const galleryTrack = document.querySelector('[data-gallery-track]');
+    const galleryPrev = document.querySelector('[data-gallery-prev]');
+    const galleryNext = document.querySelector('[data-gallery-next]');
+    const galleryStatus = document.querySelector('[data-gallery-status]');
+    const galleryDots = document.querySelector('[data-gallery-dots]');
+    this._galleryHandlers = [];
+    if (galleryTrack && galleryPrev && galleryNext) {
+      const galleryCards = Array.from(galleryTrack.querySelectorAll('[data-gallery-card]'));
+      const loopCopies = galleryCards.slice(0, Math.min(4, galleryCards.length)).map(card => {
+        const copy = card.cloneNode(true);
+        copy.removeAttribute('data-reveal');
+        copy.setAttribute('data-gallery-clone', '');
+        copy.setAttribute('aria-hidden', 'true');
+        galleryTrack.appendChild(copy);
+        return copy;
+      });
+      this._galleryClones = loopCopies;
+      let galleryIndex = 0;
+      let galleryPaused = false;
+      let galleryLooping = false;
+      const galleryDotButtons = [];
+      const addGalleryHandler = (el, type, fn, options) => {
+        el.addEventListener(type, fn, options);
+        this._galleryHandlers.push([el, type, fn]);
+      };
+      const setGalleryStatus = () => {
+        if (galleryStatus) galleryStatus.textContent = `Image ${galleryIndex + 1} of ${galleryCards.length}`;
+        galleryDotButtons.forEach((dot, index) => {
+          const active = index === galleryIndex;
+          dot.classList.toggle('is-active', active);
+          dot.setAttribute('aria-current', active ? 'true' : 'false');
+        });
+      };
+      const goToGallery = (index, smooth = true) => {
+        if (!galleryCards.length) return;
+        galleryLooping = false;
+        galleryIndex = (index + galleryCards.length) % galleryCards.length;
+        const card = galleryCards[galleryIndex];
+        galleryTrack.scrollTo({
+          left: card.offsetLeft - galleryCards[0].offsetLeft,
+          behavior: smooth && !reduce ? 'smooth' : 'auto'
+        });
+        setGalleryStatus();
+      };
+      const advanceGallery = () => {
+        if (galleryIndex < galleryCards.length - 1 || !loopCopies.length) {
+          goToGallery(galleryIndex + 1);
+          return;
+        }
+        galleryLooping = true;
+        galleryIndex = 0;
+        setGalleryStatus();
+        galleryTrack.scrollTo({
+          left: loopCopies[0].offsetLeft - galleryCards[0].offsetLeft,
+          behavior: reduce ? 'auto' : 'smooth'
+        });
+        if (this._galleryLoopTimer) clearTimeout(this._galleryLoopTimer);
+        this._galleryLoopTimer = setTimeout(() => {
+          galleryTrack.scrollTo({ left: 0, behavior: 'auto' });
+          galleryLooping = false;
+        }, reduce ? 0 : 720);
+      };
+      const stopGallery = () => { galleryPaused = true; };
+      const resumeGallery = () => { galleryPaused = false; };
+      const pauseTemporarily = () => {
+        galleryPaused = true;
+        if (this._galleryResumeTimer) clearTimeout(this._galleryResumeTimer);
+        this._galleryResumeTimer = setTimeout(() => { galleryPaused = false; }, 5600);
+      };
+      const onGalleryPrev = () => { pauseTemporarily(); goToGallery(galleryIndex - 1); };
+      const onGalleryNext = () => { pauseTemporarily(); advanceGallery(); };
+      const onGalleryScroll = () => {
+        if (galleryLooping) return;
+        if (this._galleryScrollTimer) clearTimeout(this._galleryScrollTimer);
+        this._galleryScrollTimer = setTimeout(() => {
+          let nearest = 0;
+          let distance = Infinity;
+          galleryCards.forEach((card, index) => {
+            const d = Math.abs((card.offsetLeft - galleryCards[0].offsetLeft) - galleryTrack.scrollLeft);
+            if (d < distance) { distance = d; nearest = index; }
+          });
+          galleryIndex = nearest;
+          setGalleryStatus();
+        }, 90);
+      };
+      if (galleryDots) {
+        galleryCards.forEach((card, index) => {
+          const dot = document.createElement('button');
+          dot.type = 'button';
+          dot.className = 'gallery-dot';
+          dot.setAttribute('aria-label', `Show gallery image ${index + 1}`);
+          const onDot = () => { pauseTemporarily(); goToGallery(index); };
+          addGalleryHandler(dot, 'click', onDot);
+          galleryDots.appendChild(dot);
+          galleryDotButtons.push(dot);
+        });
+        this._galleryDots = galleryDotButtons;
+      }
+      addGalleryHandler(galleryPrev, 'click', onGalleryPrev);
+      addGalleryHandler(galleryNext, 'click', onGalleryNext);
+      addGalleryHandler(galleryTrack, 'scroll', onGalleryScroll, { passive: true });
+      [...galleryCards, ...loopCopies].forEach((card) => {
+        addGalleryHandler(card, 'pointerenter', stopGallery, { passive: true });
+        addGalleryHandler(card, 'pointerleave', resumeGallery, { passive: true });
+      });
+      addGalleryHandler(galleryTrack, 'focusin', stopGallery);
+      addGalleryHandler(galleryTrack, 'focusout', resumeGallery);
+      addGalleryHandler(galleryTrack, 'touchstart', pauseTemporarily, { passive: true });
+      if (!reduce) {
+        this._galleryInterval = setInterval(() => {
+          if (!galleryPaused && !document.hidden) advanceGallery();
+        }, 3400);
+      }
+      setGalleryStatus();
+    }
+
+    // ---- Magic sparkle cursor (desktop only) ----
+    if (!reduce && !coarse) {
+      const layer = document.createElement('div');
+      layer.setAttribute('aria-hidden', 'true');
+      layer.style.cssText = 'position:fixed; inset:0; pointer-events:none; z-index:9999; overflow:hidden;';
+      document.body.appendChild(layer);
+      document.documentElement.style.cursor = 'none';
+      document.documentElement.classList.add('magic-custom-cursor');
+      this._cursorLayer = layer;
+
+      // 3D magic wand cursor
+      const wand = document.createElement('div');
+      wand.style.cssText = 'position:fixed; left:0; top:0; width:228px; height:228px; margin:-95px 0 0 -107px; pointer-events:none; opacity:1; transition:transform .08s ease-out,opacity .16s ease; will-change:transform,opacity; filter:drop-shadow(0 10px 12px rgba(74,63,107,.22));';
+      wand.innerHTML = `<img src="assets/magic-wand.png" alt="" aria-hidden="true" draggable="false" style="display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;">`;
+      layer.appendChild(wand);
+
+      const handCursor = document.createElement('div');
+      handCursor.style.cssText = 'position:fixed; left:0; top:0; width:161px; height:161px; margin:-87px 0 0 -52px; pointer-events:none; opacity:0; transition:transform .12s ease-out,opacity .16s ease; will-change:transform,opacity; filter:drop-shadow(0 8px 10px rgba(74,63,107,.18));';
+      handCursor.innerHTML = `<img src="assets/hand-cursor.png" alt="" aria-hidden="true" draggable="false" style="display:block;width:100%;height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none;">`;
+      layer.appendChild(handCursor);
+
+      const glyphs = ['✦','★','♥','✺','✧','🫧'];
+      const colors = ['#ff8ec4','#ffd45e','#9fd6f5','#b9a7f3','#9fe7c9','#ff6fae'];
+      const trailColors = ['#fff4a8','#ffd45e','#ff8ec4','#c08bff','#8b6ee8','#9fd6f5'];
+      const interactiveSelector = 'a,button,input,select,textarea,label,summary,[role="button"],[role="tab"],[data-game-level],[data-game-picker],[data-gallery-card],[data-gallery-dots] button';
+      let tx = window.innerWidth / 2, ty = window.innerHeight / 2;
+      let wx = tx, wy = ty, lastSpawn = 0, lastTrail = 0, cursorInteractive = false;
+
+      const spawn = (x, y, opts = {}) => {
+        const s = document.createElement('span');
+        const g = opts.glyph || glyphs[(Math.random() * glyphs.length) | 0];
+        const c = colors[(Math.random() * colors.length) | 0];
+        const size = opts.size || (10 + Math.random() * 14);
+        const dx = (opts.dx != null ? opts.dx : (Math.random() - 0.5) * 60);
+        const dy = (opts.dy != null ? opts.dy : (20 + Math.random() * 50));
+        const dur = opts.dur || (0.7 + Math.random() * 0.6);
+        s.textContent = g;
+        s.style.cssText = `position:fixed; left:${x}px; top:${y}px; font-size:${size}px; color:${c}; text-shadow:0 0 8px ${c}; pointer-events:none; transform:translate(-50%,-50%); --dx:${dx}px; --dy:${dy}px; animation:sparkOut ${dur}s ease-out forwards; will-change:transform,opacity;`;
+        layer.appendChild(s);
+        setTimeout(() => s.remove(), dur * 1000 + 60);
+      };
+
+      const drawTrail = (x, y, angle = 0) => {
+        const mark = document.createElement('span');
+        const glyph = Math.random() > 0.55 ? '✦' : '✧';
+        const c = trailColors[(Math.random() * trailColors.length) | 0];
+        const size = 9 + Math.random() * 9;
+        const dx = (Math.random() - 0.5) * 22;
+        const dy = (Math.random() - 0.5) * 22;
+        mark.textContent = glyph;
+        mark.style.cssText = `position:fixed;left:${x}px;top:${y}px;font-size:${size}px;color:${c};text-shadow:0 0 8px ${c},0 0 18px ${c};pointer-events:none;transform:translate(-50%,-50%);--dx:${dx}px;--dy:${dy}px;--rot:${angle}deg;animation:magicTrail 3s ease-out forwards;will-change:transform,opacity,filter;`;
+        layer.appendChild(mark);
+        setTimeout(() => mark.remove(), 3060);
+      };
+
+      this._onMove = (e) => {
+        const px = tx, py = ty;
+        tx = e.clientX; ty = e.clientY;
+        const overInteractive = !!(e.target && e.target.closest && e.target.closest(interactiveSelector));
+        cursorInteractive = overInteractive;
+        wand.style.opacity = overInteractive ? '0' : '1';
+        handCursor.style.opacity = overInteractive ? '1' : '0';
+        document.documentElement.style.cursor = 'none';
+        if (overInteractive) return;
+        const now = performance.now();
+        const angle = Math.atan2(ty - py, tx - px) * 180 / Math.PI;
+        if (now - lastTrail > 34) {
+          lastTrail = now;
+          drawTrail(tx + (Math.random()-0.5)*8, ty + (Math.random()-0.5)*8, angle);
+        }
+        if (now - lastSpawn > 55) { lastSpawn = now; spawn(tx + (Math.random()-0.5)*10, ty + (Math.random()-0.5)*10, { size: 9 + Math.random()*9, dy: 14 + Math.random()*30 }); }
+      };
+      this._onClick = (e) => {
+        if (e.target && e.target.closest && e.target.closest(interactiveSelector)) return;
+        const n = 12;
+        for (let i = 0; i < n; i++) {
+          const a = (i / n) * Math.PI * 2;
+          const dist = 36 + Math.random() * 46;
+          spawn(e.clientX, e.clientY, { dx: Math.cos(a) * dist, dy: Math.sin(a) * dist, size: 12 + Math.random()*12, dur: 0.6 + Math.random()*0.4 });
+        }
+      };
+      window.addEventListener('mousemove', this._onMove, { passive: true });
+      window.addEventListener('mousedown', this._onClick, { passive: true });
+
+      const tick = () => {
+        wx += (tx - wx) * 0.22; wy += (ty - wy) * 0.22;
+        wand.style.transform = `translate(${wx}px, ${wy}px) scale(${cursorInteractive ? .82 : 1}) translateZ(0)`;
+        handCursor.style.transform = `translate(${wx}px, ${wy}px) scale(${cursorInteractive ? 1 : .86}) translateZ(0)`;
+        this._raf = requestAnimationFrame(tick);
+      };
+      this._raf = requestAnimationFrame(tick);
+    }
+  }
+
+  componentDidUpdate() {
+    if (this._setActiveNav) this._setActiveNav(this._activeSection || 'home');
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+    document.removeEventListener('pointerdown', this._onOutsideMenu);
+    document.removeEventListener('keydown', this._onMenuKey);
+    if (this._onNavSectionScroll) window.removeEventListener('scroll', this._onNavSectionScroll);
+    if (this._navRaf) cancelAnimationFrame(this._navRaf);
+    if (this._onScroll) { window.removeEventListener('scroll', this._onScroll); window.removeEventListener('resize', this._onScroll); }
+    if (this._safety) clearTimeout(this._safety);
+    if (this._io) this._io.disconnect();
+    if (this._tiltHandlers) this._tiltHandlers.forEach(([c, m, l]) => { c.removeEventListener('mousemove', m); c.removeEventListener('mouseleave', l); });
+    if (this._bio) this._bio.disconnect();
+    if (this._bentoSafety) clearTimeout(this._bentoSafety);
+    if (this._bentoTimers) this._bentoTimers.forEach(t => clearTimeout(t));
+    if (this._bentoHandlers) this._bentoHandlers.forEach(([el, type, fn]) => { el.removeEventListener(type, fn); });
+    if (this._gameTimers) this._gameTimers.forEach(t => clearTimeout(t));
+    if (this._gameHandlers) this._gameHandlers.forEach(([el, type, fn]) => { el.removeEventListener(type, fn); });
+    if (this._patternTimers) this._patternTimers.forEach(t => clearTimeout(t));
+    if (this._patternHandlers) this._patternHandlers.forEach(([el, type, fn]) => { el.removeEventListener(type, fn); });
+    if (this._feedTimers) this._feedTimers.forEach(t => clearTimeout(t));
+    if (this._feedHandlers) this._feedHandlers.forEach(([el, type, fn]) => { el.removeEventListener(type, fn); });
+    if (this._balloonTimers) this._balloonTimers.forEach(t => clearTimeout(t));
+    if (this._balloonHandlers) this._balloonHandlers.forEach(([el, type, fn]) => { el.removeEventListener(type, fn); });
+    if (this._galleryInterval) clearInterval(this._galleryInterval);
+    if (this._galleryScrollTimer) clearTimeout(this._galleryScrollTimer);
+    if (this._galleryLoopTimer) clearTimeout(this._galleryLoopTimer);
+    if (this._galleryResumeTimer) clearTimeout(this._galleryResumeTimer);
+    if (this._galleryHandlers) this._galleryHandlers.forEach(([el, type, fn]) => { el.removeEventListener(type, fn); });
+    if (this._galleryClones) this._galleryClones.forEach(el => el.remove());
+    if (this._galleryDots) this._galleryDots.forEach(el => el.remove());
+    if (this._onMove) window.removeEventListener('mousemove', this._onMove);
+    if (this._onClick) window.removeEventListener('mousedown', this._onClick);
+    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._cursorLayer) this._cursorLayer.remove();
+    document.documentElement.classList.remove('magic-custom-cursor');
+    document.documentElement.style.cursor = '';
+  }
+
+  renderVals() {
+    const telHref = 'tel:+94710365378';
+    const waHref = 'https://wa.me/94716973676?text=' + encodeURIComponent("Hi! I'd like to know more about Children Day Care Center.");
+    return {
+      menuOpen: this.state.menuOpen,
+      isMobile: this.state.isMobile,
+      isDesktop: !this.state.isMobile,
+      telHref,
+      waHref,
+      imgError: (e) => { e.target.style.display = 'none'; },
+      toggleMenu: () => this.setState(s => ({ menuOpen: !s.menuOpen })),
+      closeMenu: () => this.setState({ menuOpen: false })
+    };
+  }
+}
+</script>
+</body>
+</html>
